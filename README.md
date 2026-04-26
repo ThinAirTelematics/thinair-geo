@@ -1,6 +1,6 @@
 # ThinAir Geo MCP Server
 
-Connect your AI to **geocoding, routing, traffic, weather, and place search** — 10 tools via MCP, powered by Pelias + Valhalla.
+Connect your AI to **geocoding, routing, traffic, weather, and place search** — 10 tools via MCP.
 
 [![npm version](https://img.shields.io/npm/v/thinair-geo)](https://www.npmjs.com/package/thinair-geo)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -32,15 +32,15 @@ ThinAir Geo is a [Model Context Protocol (MCP)](https://modelcontextprotocol.io)
 
 ## Vehicle Profiles
 
-| Profile | Costing | Use Case |
-|---------|---------|----------|
-| `car_default` | auto | Standard driving |
-| `truck_53` | truck | 53' dry van / full freight |
-| `truck_box26` | truck | Box truck / medium duty |
-| `truck_tanker` | truck | Hazmat-capable freight |
-| `motorcycle` | motorcycle | Two-wheel routing |
-| `bike` | bicycle | Cycling |
-| `walk` | pedestrian | Walking |
+| Profile | Use Case |
+|---------|----------|
+| `car_default` | Standard driving |
+| `truck_53` | 53' dry van / full freight |
+| `truck_box26` | Box truck / medium duty |
+| `truck_tanker` | Hazmat-capable freight |
+| `motorcycle` | Two-wheel routing |
+| `bike` | Cycling |
+| `walk` | Walking |
 
 ## Quick Start
 
@@ -135,13 +135,9 @@ curl -X POST "https://api.thinair.co/v1/route/route" \
   }'
 ```
 
-## Infrastructure
+## npm Package
 
-- **Geocoding**: [Pelias](https://pelias.io) — OpenStreetMap, OpenAddresses, Who's On First, Geonames, TIGER
-- **Routing**: [Valhalla](https://valhalla.readthedocs.io) — OSM graph with live traffic overlay
-- **Traffic**: TomTom Flow API — 30+ US metro areas, 45-minute refresh
-- **Platform**: Cloudflare Workers + Azure AKS
-- **Auth**: OAuth 2.1 + API key
+[npmjs.com/package/thinair-geo](https://www.npmjs.com/package/thinair-geo)
 
 ## Get an API Key
 
