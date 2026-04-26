@@ -15,6 +15,13 @@ ThinAir Geo is a [Model Context Protocol (MCP)](https://modelcontextprotocol.io)
 - **Weather** — Current conditions and forecasts
 - **Place Search** — Nearby POI and location discovery
 
+## Product Links
+
+- **Main:** https://geo.thinair.co
+- **Connect / get key:** https://geo.thinair.co/connect
+- **Docs:** https://geo.thinair.co/docs/getting-started
+- **Pricing:** https://geo.thinair.co/checkout
+
 ## Tools
 
 | Tool | Description |
@@ -98,9 +105,7 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 
 [npmjs.com/package/@thinairtelematics/geo](https://www.npmjs.com/package/@thinairtelematics/geo)
 
-## Get an API Key
-
-Sign up at [thinair.co](https://thinair.co) to get your free API key.
+> Previously published as `thinair-geo` (now deprecated in favor of the scoped package).
 
 ## License
 
