@@ -2,12 +2,12 @@
 
 Connect your AI to **geocoding, routing, traffic, weather, and place search** — 10 tools via MCP.
 
-[![npm version](https://img.shields.io/npm/v/thinair-geo)](https://www.npmjs.com/package/thinair-geo)
+[![npm version](https://img.shields.io/npm/v/@thinairtelematics/geo)](https://www.npmjs.com/package/@thinairtelematics/geo)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ## What It Does
 
-ThinAir Geo is a [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server that gives AI agents access to production-grade geospatial tools:
+ThinAir Geo is a [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server that gives AI agents access to production-grade geospatial tools — no API integration required.
 
 - **Geocoding** — Forward, reverse, autocomplete, structured, and intersection geocoding
 - **Routing** — Turn-by-turn directions with 7 vehicle profiles including truck/freight
@@ -53,7 +53,7 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
   "mcpServers": {
     "thinair-geo": {
       "command": "npx",
-      "args": ["thinair-geo"],
+      "args": ["-y", "@thinairtelematics/geo"],
       "env": {
         "THINAIR_API_KEY": "your-api-key"
       }
@@ -69,7 +69,7 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
   "mcpServers": {
     "thinair-geo": {
       "command": "npx",
-      "args": ["thinair-geo"],
+      "args": ["-y", "@thinairtelematics/geo"],
       "env": {
         "THINAIR_API_KEY": "your-api-key"
       }
@@ -94,50 +94,9 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 }
 ```
 
-## API Endpoints
-
-| Endpoint | Description |
-|----------|-------------|
-| `https://api.thinair.co/v1/geocode/search` | Forward geocoding |
-| `https://api.thinair.co/v1/geocode/reverse` | Reverse geocoding |
-| `https://api.thinair.co/v1/geocode/autocomplete` | Autocomplete |
-| `https://api.thinair.co/v1/geocode/structured` | Structured geocoding |
-| `https://api.thinair.co/v1/route/route` | Turn-by-turn routing |
-| `https://api.thinair.co/v1/route/isochrone` | Travel-time polygons |
-| `https://api.thinair.co/v1/weather/weather` | Current weather |
-| `https://api.thinair.co/v1/weather/traffic` | Live traffic |
-
-## Example Usage
-
-```bash
-# Forward geocoding
-curl "https://api.thinair.co/v1/geocode/search?text=1600+Pennsylvania+Ave+Washington+DC"
-
-# Truck route — Houston to Dallas
-curl -X POST "https://api.thinair.co/v1/route/route" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "locations": [
-      {"lat": 29.7604, "lon": -95.3698},
-      {"lat": 32.7767, "lon": -96.7970}
-    ],
-    "costing": "truck",
-    "costing_options": {
-      "truck": {
-        "height": 4.11,
-        "width": 2.6,
-        "length": 22.25,
-        "weight": 36.3,
-        "use_truck_route": 1,
-        "use_highways": 1
-      }
-    }
-  }'
-```
-
 ## npm Package
 
-[npmjs.com/package/thinair-geo](https://www.npmjs.com/package/thinair-geo)
+[npmjs.com/package/@thinairtelematics/geo](https://www.npmjs.com/package/@thinairtelematics/geo)
 
 ## Get an API Key
 
