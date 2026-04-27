@@ -1,7 +1,11 @@
 {
   "name": "@thinairtelematics/geo",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "mcpName": "co.thinair/geo",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ThinAirTelematics/thinair-geo.git"
+  },
   "publishConfig": {
     "access": "public"
   },
