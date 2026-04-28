@@ -1,6 +1,6 @@
 {
   "name": "@thinairtelematics/geo",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "mcpName": "co.thinair/geo",
   "repository": {
     "type": "git",
@@ -9,7 +9,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "description": "Connect your AI to geocoding, routing, traffic, weather, and place search \u2014 10 tools via MCP.",
+  "description": "Connect your AI to geocoding, routing, traffic, weather, and place search — 11 tools via MCP.",
   "keywords": [
     "mcp",
     "geocoding",
@@ -31,7 +31,8 @@
   "license": "MIT",
   "type": "module",
   "bin": {
-    "thinair-geo": "bin/start.js"
+    "thinair-geo": "bin/start.js",
+    "thinair-geo-server": "bin/server.js"
   },
   "files": [
     "bin/",
@@ -40,5 +41,8 @@
   ],
   "engines": {
     "node": ">=18"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
   }
 }
