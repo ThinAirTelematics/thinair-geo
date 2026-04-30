@@ -4,6 +4,7 @@ Connect your AI to **geocoding, routing, traffic, weather, and place search** â€
 
 [![npm version](https://img.shields.io/npm/v/@thinairtelematics/geo)](https://www.npmjs.com/package/@thinairtelematics/geo)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![smithery badge](https://smithery.ai/badge/bwakefield/thinair-geo)](https://smithery.ai/servers/bwakefield/thinair-geo)
 
 ## What It Does
 
