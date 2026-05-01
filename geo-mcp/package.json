@@ -1,6 +1,6 @@
 {
   "name": "@thinairtelematics/geo-mcp",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "description": "Connect your AI to geocoding, routing, traffic, weather, and place search — 10 tools via MCP.",
   "keywords": [
     "mcp",
