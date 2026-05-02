@@ -3,31 +3,31 @@
   "name": "co.thinair/geo",
   "description": "Geocoding, truck routing, traffic, weather, and place search via MCP — 11 hosted tools.",
   "websiteUrl": "https://geo.thinair.co",
-  "version": "2.1.1",
-  "configSchema": {
-    "type": "object",
-    "properties": {
-      "apiKey": {
-        "type": "string",
-        "title": "ThinAir Geo API Key",
-        "description": "Free tier: 15 requests/day, no card required. Get a key at https://geo.thinair.co/connect (anonymous instant key, or email-named key for rotation). Paste it here and the MCP client will send it as a Bearer header on every call."
-      }
-    }
-  },
+  "version": "2.1.2",
   "remotes": [
     {
       "type": "streamable-http",
       "url": "https://geo.thinair.co/mcp",
-      "headers": {
-        "Authorization": "Bearer ${apiKey}"
-      }
+      "headers": [
+        {
+          "name": "Authorization",
+          "description": "Paste `Bearer ta_live_...` (or `Bearer ta_trial_...`). Get a free key — 15 req/day, no card — at https://geo.thinair.co/connect.",
+          "isRequired": true,
+          "isSecret": true
+        }
+      ]
     },
     {
       "type": "sse",
       "url": "https://geo.thinair.co/sse",
-      "headers": {
-        "Authorization": "Bearer ${apiKey}"
-      }
+      "headers": [
+        {
+          "name": "Authorization",
+          "description": "Paste `Bearer ta_live_...` (or `Bearer ta_trial_...`). Get a free key — 15 req/day, no card — at https://geo.thinair.co/connect.",
+          "isRequired": true,
+          "isSecret": true
+        }
+      ]
     }
   ]
 }
