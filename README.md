@@ -39,6 +39,8 @@ ThinAir Geo is a [Model Context Protocol (MCP)](https://modelcontextprotocol.io)
 | `explore` | Browse cities, neighborhoods, and venues by region |
 | `quota` | Inspect your current plan, daily usage, and remaining capacity (free, never debits) |
 
+Plus an `issue_api_key` utility — exposed via MCP for the API-key issuance flow but not part of the customer-facing 10-tool surface. Most clients complete OAuth at first use and never call it directly.
+
 ## Truck Vehicle Profiles
 
 Pass any of these as `vehicle_profile` on `directions` or `isochrone` to set dimensions automatically:
