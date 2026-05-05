@@ -1,9 +1,9 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "co.thinair/geo",
-  "description": "Full-stack geo tools for AI agents via MCP — one server covering geocoding, multi-profile routing (auto, truck, bicycle, pedestrian), isochrones, live traffic, weather, and place search. Coordinates you can actually route from: intersection-level precision with confidence scores, no silent fallbacks. Trucking constraints (hazmat, dimensions, weight, time/distance) native. 10 tools: geocode, reverse_geocode, batch_geocode, directions, isochrone, traffic, weather, search_places, explore, quota. OAuth 2.1 (keyless) or API key auth. Globally edge-deployed, flat pricing at scale.",
+  "description": "Full-stack geo tools for AI agents via MCP — one server covering geocoding, multi-profile routing (auto, truck, bicycle, pedestrian), isochrones, live traffic, weather, and place search. Coordinates you can actually route from: intersection-level precision with confidence scores, no silent fallbacks. Trucking constraints (hazmat, dimensions, weight, time/distance) native. 10 tools (geocode, reverse_geocode, batch_geocode, directions, isochrone, traffic, weather, search_places, explore, quota) plus an issue_api_key utility for the API-key issuance flow. OAuth 2.1 (keyless) or API key auth. Globally edge-deployed, flat pricing at scale.",
   "websiteUrl": "https://geo.thinair.co",
-  "version": "2.1.5",
+  "version": "2.1.6",
   "remotes": [
     {
       "type": "streamable-http",
