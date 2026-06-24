@@ -2,9 +2,28 @@
 
 **Give your AI agent complete geospatial awareness** — geocode addresses and intersections, route across multiple modes (auto, truck, bicycle, pedestrian), check live traffic and weather, draw reachability polygons, and search places. Confidence-scored results so your agent knows when to ask again. 10 tools via MCP.
 
+**10 MCP tools** · Geocoding, routing, traffic, weather, places · Built for fleet-grade workflows
+
 [![npm version](https://img.shields.io/npm/v/@thinairtelematics/geo)](https://www.npmjs.com/package/@thinairtelematics/geo)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![smithery badge](https://smithery.ai/badge/thinair/geo)](https://smithery.ai/servers/thinair/geo)
+
+```console
+> geocode "Port of Houston Bayport Terminal"
+✓ matched: Bayport Container Terminal
+✓ confidence: 0.97
+✓ coordinates: 29.6008, -95.0201
+```
+
+## Part of ThinAir
+
+ThinAir Geo is the geospatial intelligence layer behind ThinAir fleet workflows: geocoding, routing context, address search, service-area visibility, map intelligence, traffic, weather, and reachability.
+
+## Hosted product vs this repository
+
+- `geo.thinair.co` is the hosted ThinAir product.
+- This repository is the thin public MCP package/pointer for developers and AI-agent clients.
+- Production use may require a ThinAir account, API key, OAuth connection, or hosted workspace.
 
 ## What It Does
 
@@ -19,10 +38,11 @@ ThinAir Geo is a [Model Context Protocol (MCP)](https://modelcontextprotocol.io)
 
 ## Product Links
 
-- **Main:** https://geo.thinair.co
+- **Product:** https://geo.thinair.co
 - **Connect / get key:** https://geo.thinair.co/connect
 - **Docs:** https://geo.thinair.co/docs/getting-started
 - **Pricing:** https://geo.thinair.co/checkout
+- **ThinAir:** https://thinair.co
 
 ## Tools
 
@@ -102,6 +122,10 @@ npx -y @thinairtelematics/geo
 ```
 
 Prints a config block to stdout for your client. Same OAuth-keyless option as above by default.
+
+## Not for secrets
+
+Do not commit API keys. Use OAuth where supported or pass API keys through your MCP client's secure environment/header configuration.
 
 ## npm Package
 
