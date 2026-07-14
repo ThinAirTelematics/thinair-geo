@@ -1,8 +1,8 @@
 # ThinAir Geo MCP Server
 
-**Give your AI agent complete geospatial awareness** — geocode addresses and intersections, route across multiple modes (auto, truck, bicycle, pedestrian), check live traffic and weather, draw reachability polygons, and search places. Confidence-scored results so your agent knows when to ask again. 10 tools via MCP.
+**Give your AI agent complete geospatial awareness** — geocode addresses and intersections, route across multiple modes (auto, truck, bicycle, pedestrian), check live traffic and weather, draw reachability polygons, and search places. Confidence-scored results so your agent knows when to ask again. 19 tools via MCP.
 
-**10 MCP tools** · Geocoding, routing, traffic, weather, places · Built for fleet-grade workflows
+**19 MCP tools** · Geocoding, routing, traffic, weather, places · Built for fleet-grade workflows
 
 [![npm version](https://img.shields.io/npm/v/@thinairtelematics/geo)](https://www.npmjs.com/package/@thinairtelematics/geo)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -57,9 +57,16 @@ ThinAir Geo is a [Model Context Protocol (MCP)](https://modelcontextprotocol.io)
 | `weather` | Current conditions and forecasts |
 | `search_places` | Find nearby POIs by category (gas, charging, food, lodging, …) |
 | `explore` | Browse cities, neighborhoods, and venues by region |
+| `geocode_structured` | Geocode from discrete address components (form / CRM fields) instead of free text |
+| `resolve_intersection` | Resolve a named cross-street (street1 × street2) to a coordinate with a confidence score |
+| `distance_matrix` | Road distances + travel times for every origin → destination pair (≤ 625 pairs) |
+| `locate` | Snap a coordinate to the road network — road name, class, speed limit, legality, timezone |
+| `map_match` | Snap a raw GPS trace (2–100 points) to the road-accurate route actually driven |
+| `trace_attributes` | Per-segment road attributes (names, classes, speed limits, surfaces) along a matched trace |
+| `geofence_contains` | Point-in-polygon test against a GeoJSON polygon (one boolean per point) |
+| `place_get` | Look up a place by its stable ThinAir id (`ta_place_…` / `ta_intersection_…`) |
 | `quota` | Inspect your current plan, daily usage, and remaining capacity (free, never debits) |
-
-Plus an `issue_api_key` utility — exposed via MCP for the API-key issuance flow but not part of the customer-facing 10-tool surface. Most clients complete OAuth at first use and never call it directly.
+| `issue_api_key` | Mint a fresh API key for the current tenant (counts as 1 query) |
 
 ## Truck Vehicle Profiles
 

@@ -7,7 +7,7 @@
 
 > **Primary package:** this is also published as [`@thinairtelematics/geo`](https://www.npmjs.com/package/@thinairtelematics/geo) — the recommended scoped package. Both print a config for the same hosted server.
 
-ThinAir Geo MCP is a **hosted** [Model Context Protocol](https://modelcontextprotocol.io) server with 10 geospatial tools — geocoding, turn-by-turn truck routing, live traffic (30 US metros), 16-day weather forecasts, drive-time isochrones, and place search.
+ThinAir Geo MCP is a **hosted** [Model Context Protocol](https://modelcontextprotocol.io) server with 19 geospatial tools — geocoding, turn-by-turn truck routing, live traffic (30 US metros), 16-day weather forecasts, drive-time isochrones, and place search.
 
 No local server to run. No Docker. No ports. This npm package is a tiny config printer; the actual MCP server is hosted at `geo.thinair.co/mcp`.
 

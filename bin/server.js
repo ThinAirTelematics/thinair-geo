@@ -84,6 +84,54 @@ const TOOLS = [
     inputSchema: { type: "object" },
   },
   {
+    name: "geocode_structured",
+    description:
+      "Geocode from discrete address components (address, locality, region, postalcode, country) instead of one free-text string. Use when input is already fielded (forms, CRM, stop tables) — skips free-text parsing. At least one component required. For named intersections use resolve_intersection.",
+    inputSchema: { type: "object" },
+  },
+  {
+    name: "resolve_intersection",
+    description:
+      "Resolve a NAMED cross-street (street1 × street2 within a locality/region/country) to a single best coordinate with a confidence score and a fleet-safe fallback. For free-form streets use geocode.",
+    inputSchema: { type: "object" },
+  },
+  {
+    name: "distance_matrix",
+    description:
+      "Compute road distances and travel times for every origin -> destination pair. Endpoints accept free-text addresses or 'lat,lon'; N x M is capped at 625 pairs. Use for fleet dispatch, nearest-depot, and bulk ETA tables.",
+    inputSchema: { type: "object" },
+  },
+  {
+    name: "locate",
+    description:
+      "Snap one coordinate to the road network and return the matched road's context: name, road class, speed limit, bearing, snap distance, side of street, truck legality, toll/ferry/highway/bridge/tunnel flags, and IANA timezone. Returns matched:false when no routable road is near — never a guess.",
+    inputSchema: { type: "object" },
+  },
+  {
+    name: "map_match",
+    description:
+      "Snap a raw GPS trace (2-100 points) to the road network and return the road-accurate route actually driven: matched geometry, distance, time, road names, and a 0-1 confidence. For planning a route between places use directions.",
+    inputSchema: { type: "object" },
+  },
+  {
+    name: "trace_attributes",
+    description:
+      "Return per-segment road/network attributes for a matched GPS trace (2-100 points): road names, classes, speed limits, surfaces, truck-route flags, and segment lengths, plus a matcher confidence score. For just the matched route line use map_match.",
+    inputSchema: { type: "object" },
+  },
+  {
+    name: "geofence_contains",
+    description:
+      "Test one or more points for containment inside a caller-supplied GeoJSON polygon (or MultiPolygon / Feature / FeatureCollection). Pure geometry — boundary points count as contained. Returns one boolean per input point.",
+    inputSchema: { type: "object" },
+  },
+  {
+    name: "place_get",
+    description:
+      "Look up a place by its stable ThinAir id (ta_place_... / ta_intersection_...) as returned in the id field of geocode, reverse_geocode, search_places, or resolve_intersection. Returns canonical name, label, layer, and coordinates.",
+    inputSchema: { type: "object" },
+  },
+  {
     name: "quota",
     description:
       "Check current usage, remaining limits, plan, and quota breakdown for the caller. FREE TO CALL — never counts against your quota, never blocked by it. Use this proactively when the user asks about usage or seems near limits.",
