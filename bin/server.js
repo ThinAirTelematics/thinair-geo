@@ -104,7 +104,7 @@ const TOOLS = [
   {
     name: "locate",
     description:
-      "Snap one coordinate to the road network and return the matched road's context: name, road class, speed limit, bearing, snap distance, side of street, truck legality, toll/ferry/highway/bridge/tunnel flags, and IANA timezone. Returns matched:false when no routable road is near — never a guess.",
+      "Snap one coordinate to the road network and return the matched road's context: name, road class, speed limit, bearing, snap distance, side of street, truck legality, toll/ferry/highway/bridge/tunnel flags, and IANA timezone. Optional point elevation via include_elevation. Returns matched:false when no routable road is near — never a guess.",
     inputSchema: { type: "object" },
   },
   {

@@ -60,7 +60,7 @@ ThinAir Geo is a [Model Context Protocol (MCP)](https://modelcontextprotocol.io)
 | `geocode_structured` | Geocode from discrete address components (form / CRM fields) instead of free text |
 | `resolve_intersection` | Resolve a named cross-street (street1 × street2) to a coordinate with a confidence score |
 | `distance_matrix` | Road distances + travel times for every origin → destination pair (≤ 625 pairs) |
-| `locate` | Snap a coordinate to the road network — road name, class, speed limit, legality, timezone |
+| `locate` | Snap a coordinate to the road network — road name, class, speed limit, legality, timezone, point elevation |
 | `map_match` | Snap a raw GPS trace (2–100 points) to the road-accurate route actually driven |
 | `trace_attributes` | Per-segment road attributes (names, classes, speed limits, surfaces) along a matched trace |
 | `geofence_contains` | Point-in-polygon test against a GeoJSON polygon (one boolean per point) |
