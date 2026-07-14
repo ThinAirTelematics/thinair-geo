@@ -3,8 +3,8 @@
 //
 // Not a local server. This binary prints a ready-to-paste MCP client config
 // for https://geo.thinair.co/mcp (or /sse with --transport sse). Your MCP
-// client handles the actual protocol — speaking URL transport to our
-// Cloudflare-hosted worker.
+// client handles the actual protocol — speaking URL transport to the
+// hosted ThinAir Geo server.
 //
 // Usage:
 //   npx @thinairtelematics/geo-mcp                   # keyless (OAuth on first call)
