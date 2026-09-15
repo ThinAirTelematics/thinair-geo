@@ -31,6 +31,7 @@
   "license": "MIT",
   "type": "module",
   "bin": {
+    "geo": "bin/start.js",
     "thinair-geo": "bin/start.js",
     "thinair-geo-server": "bin/server.js"
   },
