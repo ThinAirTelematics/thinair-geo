@@ -1,6 +1,6 @@
 {
   "name": "@thinairtelematics/geo",
-  "version": "2.1.4",
+  "version": "2.2.0",
   "mcpName": "co.thinair/geo",
   "repository": {
     "type": "git",
@@ -31,6 +31,7 @@
   "license": "MIT",
   "type": "module",
   "bin": {
+    "geo": "bin/start.js",
     "thinair-geo": "bin/start.js",
     "thinair-geo-server": "bin/server.js"
   },

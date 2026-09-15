@@ -2,7 +2,7 @@
 
 **Give your AI agent complete geospatial awareness** — geocode addresses and intersections, route across multiple modes (auto, truck, bicycle, pedestrian), check live traffic and weather, draw reachability polygons, and search places. Confidence-scored results so your agent knows when to ask again. 19 tools via MCP.
 
-**19 MCP tools** · Geocoding, routing, traffic, weather, places · Built for fleet-grade workflows
+**<!-- BEGIN:TOOLCOUNT -->19<!-- END:TOOLCOUNT --> MCP tools** · Geocoding, routing, traffic, weather, places · Built for fleet-grade workflows
 
 [![npm version](https://img.shields.io/npm/v/@thinairtelematics/geo)](https://www.npmjs.com/package/@thinairtelematics/geo)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -44,8 +44,26 @@ ThinAir Geo is a [Model Context Protocol (MCP)](https://modelcontextprotocol.io)
 - **Pricing:** https://geo.thinair.co/checkout
 - **ThinAir:** https://thinair.co
 
+## Agent Discovery
+
+<!-- BEGIN:AGENT-DISCOVERY -->
+Autonomous agents and directory crawlers can discover this server's capabilities
+without parsing this README. All three surfaces are live and served by the hosted
+product:
+
+| Surface | URL | Carries |
+|---------|-----|---------|
+| Agent card (A2A) | `https://geo.thinair.co/.well-known/agent-card.json` | Protocol version, endpoint, transport, auth schemes, and all 19 skills |
+| Skills index | `https://geo.thinair.co/.well-known/skills.json` | Machine-readable catalog of the 19 tools |
+| LLM guide | `https://geo.thinair.co/llms.txt` | Plain-text orientation for language models |
+
+The MCP endpoint itself is `https://geo.thinair.co/mcp` (streamable-http; OAuth 2.1
+keyless, or `Authorization: Bearer`).
+<!-- END:AGENT-DISCOVERY -->
+
 ## Tools
 
+<!-- BEGIN:TOOLS -->
 | Tool | Description |
 |------|-------------|
 | `geocode` | Convert addresses, place names, or intersections to coordinates |
@@ -67,6 +85,7 @@ ThinAir Geo is a [Model Context Protocol (MCP)](https://modelcontextprotocol.io)
 | `place_get` | Look up a place by its stable ThinAir id (`ta_place_…` / `ta_intersection_…`) |
 | `quota` | Inspect your current plan, daily usage, and remaining capacity (free, never debits) |
 | `issue_api_key` | Mint a fresh API key for the current tenant (counts as 1 query) |
+<!-- END:TOOLS -->
 
 ## Truck Vehicle Profiles
 
