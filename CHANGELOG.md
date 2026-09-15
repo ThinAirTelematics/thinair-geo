@@ -6,6 +6,25 @@ and the [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format.
 
 ## [Unreleased]
 
+## [2.2.1] — 2026-09-15
+
+### Fixed
+- **The README's headline example returned zero results.** It advertised
+  `geocode "Port of Houston Bayport Terminal"` resolving to "Bayport Container
+  Terminal, confidence 0.97, 29.6008 -95.0201". Live, that query returns
+  `match_count: 0` — with and without `layers=venue`. The coordinates do
+  reverse-geocode (12100 Port Road, Seabrook TX), so the location is indexed as
+  an address; the venue name is what fails. The first example a prospect tries
+  was one that could not work.
+
+  Replaced with a live-verified query. Confirmed against production on
+  2026-09-15: `geocode "Bayport Terminal"` → "Bayport Terminal, Harris County,
+  TX, USA", confidence 1, 29.61345 / -95.00292.
+
+  npm serves the README from the published tarball, so the broken example stayed
+  visible on the package page for every release since it was written — this
+  patch exists to get the corrected one published.
+
 ## [2.2.0] — 2026-09-14
 
 ### Fixed

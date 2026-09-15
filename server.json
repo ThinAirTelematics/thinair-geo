@@ -3,7 +3,7 @@
   "name": "co.thinair/geo",
   "description": "Geocoding, routing, isochrones, traffic, weather, and place search for AI agents. 19 MCP tools.",
   "websiteUrl": "https://geo.thinair.co",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "remotes": [
     {
       "type": "streamable-http",
