@@ -9,10 +9,10 @@
 [![smithery badge](https://smithery.ai/badge/thinair/geo)](https://smithery.ai/servers/thinair/geo)
 
 ```console
-> geocode "Port of Houston Bayport Terminal"
-✓ matched: Bayport Container Terminal
-✓ confidence: 0.97
-✓ coordinates: 29.6008, -95.0201
+> geocode "Bayport Terminal"
+✓ matched: Bayport Terminal, Harris County, TX, USA
+✓ confidence: 1.0  (method: search_venue)
+✓ coordinates: 29.61345, -95.00292
 ```
 
 ## Part of ThinAir
