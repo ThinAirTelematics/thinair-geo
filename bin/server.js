@@ -44,7 +44,7 @@ const TOOLS = [
   {
     name: "directions",
     description:
-      "Generate routes, ETAs, and turn-by-turn directions between locations. Prefer the `preset` arg (car_default, truck_53, truck_tanker, bike, walk, transit, etc.) — presets bake in freight baselines so trucks actually stay on freight corridors. Raw `costing` + `truck_*` knobs remain for advanced callers. ETAs are ISO-8601 in the destination's local timezone.",
+      "Generate routes, ETAs, and turn-by-turn directions between locations. Supports car / truck / motorcycle / pedestrian / bicycle, with hazmat + dimension + toll avoidance for commercial routing. Use `vehicle_profile` (10 truck profiles: DRY_VAN_53, FLATBED_48/_40, STEP_DECK, TANKER, BOX_TRUCK_26, AUTO_CARRIER, SPRINTER_VAN, DOUBLE_TRAILER, OVERSIZE) to set truck dimensions in one parameter. ETAs are ISO-8601 in the destination's local timezone.",
     inputSchema: { type: "object" },
   },
   {
@@ -80,7 +80,7 @@ const TOOLS = [
   {
     name: "explore",
     description:
-      "BROWSING / DISCOVERY search — cities, neighbourhoods, or mixed venues near a location. Supports population filtering ('cities > 100k'), distance/population sorting, and layer filtering. For specific POI categories, use `search_places` instead.",
+      "BROWSING / DISCOVERY search — administrative places (cities, neighbourhoods, boroughs, counties, regions) near a location. Supports population filtering ('cities > 100k'), distance/population sorting, and layer filtering. Venues are NOT served here — use `search_places` instead.",
     inputSchema: { type: "object" },
   },
   {
