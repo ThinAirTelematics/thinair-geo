@@ -44,7 +44,7 @@ const TOOLS = [
   {
     name: "directions",
     description:
-      "Generate routes, ETAs, and turn-by-turn directions between locations. Supports car / truck / motorcycle / pedestrian / bicycle, with hazmat + dimension + toll avoidance for commercial routing. Use `vehicle_profile` (10 truck presets: DRY_VAN_53, FLATBED_48/_40, STEP_DECK, TANKER, BOX_TRUCK_26, AUTO_CARRIER, SPRINTER_VAN, DOUBLE_TRAILER, OVERSIZE) to set truck dimensions in one parameter. ETAs are ISO-8601 in the destination's local timezone.",
+      "Generate routes, ETAs, and turn-by-turn directions between locations. Supports car / truck / motorcycle / pedestrian / bicycle, with hazmat + dimension + toll avoidance for commercial routing. Use `vehicle_profile` (10 truck profiles: DRY_VAN_53, FLATBED_48/_40, STEP_DECK, TANKER, BOX_TRUCK_26, AUTO_CARRIER, SPRINTER_VAN, DOUBLE_TRAILER, OVERSIZE) to set truck dimensions in one parameter. ETAs are ISO-8601 in the destination's local timezone.",
     inputSchema: { type: "object" },
   },
   {
