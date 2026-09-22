@@ -30,7 +30,7 @@ ThinAir Geo is the geospatial intelligence layer behind ThinAir fleet workflows:
 ThinAir Geo is a [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server that gives AI agents full-stack geospatial tooling — no API integration required. Coordinates you can actually route from: intersection-level precision with confidence scores, no silent fallbacks (returns an empty result instead of a city-centroid guess when uncertain).
 
 - **Geocoding** — Forward, reverse, intersection, and batch (50/call). Results include `confidence` and `method` so agents can branch on quality.
-- **Routing** — Multi-profile: auto, truck, bicycle, pedestrian, motorcycle. 10 truck-specific presets (dry van, flatbed, step-deck, tanker, box truck, auto-carrier, sprinter, double trailer, oversize) with hazmat / dimensions / weight / time-distance constraints native.
+- **Routing** — Multi-profile: auto, truck, bicycle, pedestrian, motorcycle. 10 truck-specific profiles (dry van, flatbed, step-deck, tanker, box truck, auto-carrier, sprinter, double trailer, oversize) with hazmat / dimensions / weight / time-distance constraints native.
 - **Traffic** — Real-time conditions for 30+ US metros.
 - **Weather** — Current conditions and forecasts.
 - **Place Search & Explore** — Nearby POIs, locality discovery with population filtering.
@@ -104,7 +104,7 @@ Pass any of these as `vehicle_profile` on `directions` to set dimensions automat
 | `DOUBLE_TRAILER` | Twin 28′ pups, LTL long-haul (92′ total) |
 | `OVERSIZE` | Permitted oversize loads — override dimensions per haul |
 
-Individual params (`truck_height`, `truck_weight`, `truck_length`, `axle_count`, etc.) override the preset.
+Individual params (`truck_height`, `truck_weight`, `truck_length`, `axle_count`, etc.) override the profile.
 
 ## Quick Start
 
