@@ -74,7 +74,7 @@ keyless, or `Authorization: Bearer`).
 | `traffic` | Real-time traffic conditions |
 | `weather` | Current conditions and forecasts |
 | `search_places` | Find nearby POIs by category (gas, charging, food, lodging, …) |
-| `explore` | Browse cities, neighborhoods, and venues by region |
+| `explore` | Browse cities, neighborhoods, and administrative areas by region (not venues — use `search_places`) |
 | `geocode_structured` | Geocode from discrete address components (form / CRM fields) instead of free text |
 | `resolve_intersection` | Resolve a named cross-street (street1 × street2) to a coordinate with a confidence score |
 | `distance_matrix` | Road distances + travel times for every origin → destination pair (≤ 625 pairs) |
@@ -89,7 +89,7 @@ keyless, or `Authorization: Bearer`).
 
 ## Truck Vehicle Profiles
 
-Pass any of these as `vehicle_profile` on `directions` or `isochrone` to set dimensions automatically:
+Pass any of these as `vehicle_profile` on `directions` to set dimensions automatically:
 
 | Profile | Dimensions / Use case |
 |---------|------------------------|
@@ -132,7 +132,7 @@ The OAuth flow completes at first use — no manual token setup required. Free t
     "thinair-geo": {
       "url": "https://geo.thinair.co/mcp",
       "headers": {
-        "Authorization": "Bearer ta_live_..."
+        "Authorization": "Bearer ta_geo_..."
       }
     }
   }
