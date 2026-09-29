@@ -37,6 +37,7 @@
   },
   "files": [
     "bin/",
+    "tools.json",
     "README.md",
     "LICENSE"
   ],
