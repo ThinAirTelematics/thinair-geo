@@ -5,7 +5,7 @@
  * Production runtime is hosted at
  * https://geo.thinair.co/mcp (streamable-http transport, OAuth 2.0 + Bearer).
  *
- * This file is a STATIC tool-catalog adapter that satisfies stdio-only
+ * This file is a tool-catalog adapter that satisfies stdio-only
  * MCP runners (e.g. Glama's automated quality check, sandboxed CI) without
  * proxying to the hosted endpoint. tools/list returns the real tool catalog
  * so the runner indexes capabilities accurately; tools/call returns a
@@ -15,6 +15,7 @@
  * (printed by `bin/start.js`). This file exists for the quality-check gate.
  */
 
+import { readFileSync } from "node:fs";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
@@ -28,127 +29,20 @@ const REDIRECT_MESSAGE =
   "Configure your MCP client with that URL (and a Bearer token from " +
   "https://geo.thinair.co/connect — free 7-day trial, no signup) to execute tools.";
 
-const TOOLS = [
-  {
-    name: "geocode",
-    description:
-      "Convert an address, place name, street, or intersection into coordinates and structured location results. Use when input is text and you need coordinates before routing, weather, or search. Supports street-level resolution and proximity biasing.",
-    inputSchema: { type: "object" },
-  },
-  {
-    name: "reverse_geocode",
-    description:
-      "Convert coordinates into the nearest address, street, or place. Use when starting from GPS coordinates or a map position.",
-    inputSchema: { type: "object" },
-  },
-  {
-    name: "directions",
-    description:
-      "Generate routes, ETAs, and turn-by-turn directions between locations. Prefer the `preset` arg (car_default, truck_53, truck_tanker, bike, walk, transit, etc.) — presets bake in freight baselines so trucks actually stay on freight corridors. Raw `costing` + `truck_*` knobs remain for advanced callers. ETAs are ISO-8601 in the destination's local timezone.",
-    inputSchema: { type: "object" },
-  },
-  {
-    name: "traffic",
-    description:
-      "Retrieve live traffic conditions, congestion, and speed for a location. Coverage: live data for ~30 major US metros; returns degraded or empty values outside these areas. For rural coordinates, qualify the response.",
-    inputSchema: { type: "object" },
-  },
-  {
-    name: "weather",
-    description:
-      "Get current and forecast weather for a location, including severe weather alerts and minute-by-minute precipitation. Use for destination conditions, travel planning, or route risk assessment.",
-    inputSchema: { type: "object" },
-  },
-  {
-    name: "isochrone",
-    description:
-      "Generate travel-time or travel-distance reachability polygons from an origin. Pass MULTIPLE bands in one call — e.g. `contours_minutes:[10,20,30]` returns three nested polygons in a single response. Output is GeoJSON ready for Mapbox / Leaflet.",
-    inputSchema: { type: "object" },
-  },
-  {
-    name: "search_places",
-    description:
-      "CATEGORY-specific POI search near a point — gas stations, truck stops, restaurants, charging stations, etc. Use this when the user has a specific TYPE of place in mind. For broader DISCOVERY (e.g. 'cities within 50 miles'), use `explore` instead.",
-    inputSchema: { type: "object" },
-  },
-  {
-    name: "batch_geocode",
-    description:
-      "Geocode multiple addresses, intersections, or place queries in one request with structured per-record results. Use for bulk operations instead of repeated single geocode calls. Max 50 per batch.",
-    inputSchema: { type: "object" },
-  },
-  {
-    name: "explore",
-    description:
-      "BROWSING / DISCOVERY search — cities, neighbourhoods, or mixed venues near a location. Supports population filtering ('cities > 100k'), distance/population sorting, and layer filtering. For specific POI categories, use `search_places` instead.",
-    inputSchema: { type: "object" },
-  },
-  {
-    name: "geocode_structured",
-    description:
-      "Geocode from discrete address components (address, locality, region, postalcode, country) instead of one free-text string. Use when input is already fielded (forms, CRM, stop tables) — skips free-text parsing. At least one component required. For named intersections use resolve_intersection.",
-    inputSchema: { type: "object" },
-  },
-  {
-    name: "resolve_intersection",
-    description:
-      "Resolve a NAMED cross-street (street1 × street2 within a locality/region/country) to a single best coordinate with a confidence score and a fleet-safe fallback. For free-form streets use geocode.",
-    inputSchema: { type: "object" },
-  },
-  {
-    name: "distance_matrix",
-    description:
-      "Compute road distances and travel times for every origin -> destination pair. Endpoints accept free-text addresses or 'lat,lon'; N x M is capped at 625 pairs. Use for fleet dispatch, nearest-depot, and bulk ETA tables.",
-    inputSchema: { type: "object" },
-  },
-  {
-    name: "locate",
-    description:
-      "Snap one coordinate to the road network and return the matched road's context: name, road class, speed limit, bearing, snap distance, side of street, truck legality, toll/ferry/highway/bridge/tunnel flags, and IANA timezone. Optional point elevation via include_elevation. Returns matched:false when no routable road is near — never a guess.",
-    inputSchema: { type: "object" },
-  },
-  {
-    name: "map_match",
-    description:
-      "Snap a raw GPS trace (2-100 points) to the road network and return the road-accurate route actually driven: matched geometry, distance, time, road names, and a 0-1 confidence. For planning a route between places use directions.",
-    inputSchema: { type: "object" },
-  },
-  {
-    name: "trace_attributes",
-    description:
-      "Return per-segment road/network attributes for a matched GPS trace (2-100 points): road names, classes, speed limits, surfaces, truck-route flags, and segment lengths, plus a matcher confidence score. For just the matched route line use map_match.",
-    inputSchema: { type: "object" },
-  },
-  {
-    name: "geofence_contains",
-    description:
-      "Test one or more points for containment inside a caller-supplied GeoJSON polygon (or MultiPolygon / Feature / FeatureCollection). Pure geometry — boundary points count as contained. Returns one boolean per input point.",
-    inputSchema: { type: "object" },
-  },
-  {
-    name: "place_get",
-    description:
-      "Look up a place by its stable ThinAir id (ta_place_... / ta_intersection_...) as returned in the id field of geocode, reverse_geocode, search_places, or resolve_intersection. Returns canonical name, label, layer, and coordinates.",
-    inputSchema: { type: "object" },
-  },
-  {
-    name: "quota",
-    description:
-      "Check current usage, remaining limits, plan, and quota breakdown for the caller. FREE TO CALL — never counts against your quota, never blocked by it. Use this proactively when the user asks about usage or seems near limits.",
-    inputSchema: { type: "object" },
-  },
-  {
-    name: "issue_api_key",
-    description:
-      "Mint a fresh API key for your current authenticated user/tenant. Useful for CLI workflows, key rotation, or MCP clients that hide the configured Bearer. The new key is tied to your existing plan. Counts as 1 query against your daily quota.",
-    inputSchema: { type: "object" },
-  },
-];
+// The catalog is generated from the live tool registrations and shipped as
+// tools.json (see package.json "files"). Resolved relative to this file so it
+// works from any working directory and from the published tarball.
+const TOOLS = JSON.parse(
+  readFileSync(new URL("../tools.json", import.meta.url), "utf8"),
+);
+const { version: PACKAGE_VERSION } = JSON.parse(
+  readFileSync(new URL("../package.json", import.meta.url), "utf8"),
+);
 
 const server = new Server(
   {
     name: "thinair-geo",
-    version: "2.0.6",
+    version: PACKAGE_VERSION,
   },
   {
     capabilities: { tools: {} },
