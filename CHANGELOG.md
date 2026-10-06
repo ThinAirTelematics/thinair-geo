@@ -6,6 +6,27 @@ and the [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format.
 
 ## [Unreleased]
 
+## [2.2.3] — 2026-10-06
+
+### Security
+- **MCP SDK range tightened to `^1.31.0`.** The dependency was declared as
+  `^1.0.0`, which still admitted `@modelcontextprotocol/sdk` 1.12.0 through
+  1.30.1, the range affected by GHSA-6qxp-vccf-f47h. A fresh install now
+  resolves a patched SDK (1.32.1 at the time of release). Transitive
+  dependencies were refreshed in the lockfile so `npm audit --omit=dev` reports
+  no known vulnerabilities.
+
+### Notes
+- The tool catalog (`tools.json`, 19 tools) is unchanged from 2.2.2 and matches
+  the live catalog.
+
+## [2.2.2] — 2026-09-29
+
+### Changed
+- `tools/list` from the local adapter now serves the full live tool catalog
+  (complete input and output schemas, annotations) from the shipped
+  `tools.json`.
+
 ## [2.2.1] — 2026-09-15
 
 ### Fixed
