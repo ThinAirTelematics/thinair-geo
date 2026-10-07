@@ -4,7 +4,7 @@ All notable changes to `@thinairtelematics/geo` are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 and the [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format.
 
-## [Unreleased]
+## [2.2.4] — 2026-10-07
 
 ### Changed
 - **`locate` now declares why a road is or is not returned.** Its output
