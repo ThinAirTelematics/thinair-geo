@@ -6,6 +6,17 @@ and the [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format.
 
 ## [Unreleased]
 
+### Changed
+- **`locate` now declares why a road is or is not returned.** Its output
+  schema declares `road_status` (`matched` | `no_road_nearby` |
+  `unavailable`), `retryable`, and `meta.degraded`, and the tool description
+  explains them. `matched:false` alone no longer stands for "no road nearby":
+  `no_road_nearby` is a real answer, while `unavailable` means the road lookup
+  could not be answered right now (`retryable: true`; timezone and elevation
+  are still filled). All three fields are optional in the schema, which stays
+  open to additional properties, so existing clients keep validating every
+  answer.
+
 ## [2.2.3] — 2026-10-06
 
 ### Security

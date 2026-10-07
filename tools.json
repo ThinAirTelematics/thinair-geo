@@ -2591,7 +2591,7 @@
   },
   {
     "name": "locate",
-    "description": "Snap one coordinate to the road network and return the matched road's context: name, road class, speed limit, bearing, snap distance, side of street, truck legality, and toll/ferry/highway/bridge/tunnel flags — plus the IANA timezone. Use to answer 'what road is this point on and what are its rules?' for fleet/telematics snapping, geofence edge checks, or enriching a GPS fix. Set `include_elevation` for terrain-sourced point `elevation_m`; `grade_pct` is a forward-compatible field that stays null for now. Returns `matched:false` when no routable road is near the point — never a guess.",
+    "description": "Snap one coordinate to the road network and return the matched road's context: name, road class, speed limit, bearing, snap distance, side of street, truck legality, and toll/ferry/highway/bridge/tunnel flags — plus the IANA timezone. Use to answer 'what road is this point on and what are its rules?' for fleet/telematics snapping, geofence edge checks, or enriching a GPS fix. Set `include_elevation` for terrain-sourced point `elevation_m`; `grade_pct` is a forward-compatible field that stays null for now. Read `road_status`, not `matched` alone: `matched` — a road was found and `road` is filled; `no_road_nearby` — a real answer: no routable road is near the point for this travel profile; `unavailable` — the road lookup could not be answered right now, so `matched:false` / `road:null` say nothing about the point, `retryable` is true, and timezone and elevation are still filled. Never a guess.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -2779,6 +2779,19 @@
         "matched": {
           "type": "boolean"
         },
+        "road_status": {
+          "type": "string",
+          "enum": [
+            "matched",
+            "no_road_nearby",
+            "unavailable"
+          ],
+          "description": "Why `road` is what it is. `matched`: a routable road was found. `no_road_nearby`: the lookup answered and found no routable road near the point for this travel profile. `unavailable`: the road lookup could not be answered right now; this says nothing about the point, `retryable` is true, and timezone/elevation are still filled."
+        },
+        "retryable": {
+          "type": "boolean",
+          "description": "Present and true only when `road_status` is `unavailable`: the same call may succeed shortly."
+        },
         "location": {
           "type": "object",
           "properties": {
@@ -2855,7 +2868,13 @@
         },
         "meta": {
           "type": "object",
-          "additionalProperties": {}
+          "properties": {
+            "degraded": {
+              "type": "boolean",
+              "description": "Present and true only when `road_status` is `unavailable`: the road part of the answer is missing; the rest is real."
+            }
+          },
+          "additionalProperties": true
         }
       },
       "additionalProperties": true,
