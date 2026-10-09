@@ -2531,7 +2531,7 @@
         },
         "api_key": {
           "type": "string",
-          "description": "One-time API key secret. Returned only on successful creation, in both structuredContent.api_key and content[0].text — save it immediately. The server stores only sha-256 of the secret; once this response is lost, the key is unrecoverable and must be rotated. Matches AWS IAM / Stripe / GitHub PAT one-time-reveal semantics."
+          "description": "One-time API key secret. Returned only on successful creation, in both structuredContent.api_key and content[0].text. Save this key now. It is shown once. ThinAir authenticates using a hash of the key. Matches AWS IAM / Stripe / GitHub PAT one-time-reveal semantics."
         },
         "key_id": {
           "type": "string",
