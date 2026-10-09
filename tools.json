@@ -2510,7 +2510,7 @@
   },
   {
     "name": "issue_api_key",
-    "description": "Issue a fresh ta_geo_* API key for ThinAir GEO (geocoding/routing) for your current authenticated user/tenant, and rotate: any previous key keeps working for one hour, then stops — the response reports how many and exactly when (previous_keys_retiring, previous_keys_retire_at). Use it to rotate, or when a CLI/MCP client needs a key and can't reach the console. The new key is tied to your existing plan. Counts as 1 query against your daily quota. NOTE: this key works ONLY against ThinAir Geo — it does NOT authenticate against ThinAir Data, which issues its own ta_data_* key from its own identically-named tool.",
+    "description": "Get the link to create a ThinAir GEO (geocoding/routing) API key. Returns console_url (the signed-in ThinAir Geo console) and instructions; it does NOT return a key and does not create, rotate or revoke any key. The owner signs in, creates the key there and sees it once in their own browser, then sends it as an Authorization: Bearer header. Existing keys keep working. Counts as 1 query against your daily quota. NOTE: keys created there work ONLY against ThinAir Geo — they do NOT authenticate against ThinAir Data, which issues its own ta_data_* keys from its own identically-named tool.",
     "inputSchema": {
       "type": "object",
       "properties": {},
@@ -2526,33 +2526,15 @@
             "error"
           ]
         },
-        "credential_returned_once": {
-          "type": "boolean"
-        },
-        "api_key": {
+        "console_url": {
           "type": "string",
-          "description": "One-time API key secret. Returned only on successful creation, in both structuredContent.api_key and content[0].text. Save this key now. It is shown once. ThinAir authenticates using a hash of the key. Matches AWS IAM / Stripe / GitHub PAT one-time-reveal semantics."
+          "description": "Link to the signed-in ThinAir Geo console, where the owner creates an API key and sees it once in their own browser. This tool never returns a key."
         },
-        "key_id": {
+        "instructions": {
           "type": "string",
-          "description": "Non-secret fingerprint of the issued key. Safe to log and surface in UI."
-        },
-        "previous_keys_retiring": {
-          "type": "integer",
-          "minimum": 0,
-          "description": "How many previously-live keys this mint scheduled to retire. issue_api_key rotates: after the grace window the returned key is the only live key on the account. 0 means there was nothing else."
-        },
-        "previous_keys_retire_at": {
-          "type": "string",
-          "description": "ISO 8601 instant when the previous keys stop working (one hour after this mint). Present only when previous_keys_retiring > 0. Update anything still using them before this time."
-        },
-        "user": {
-          "type": "string"
+          "description": "How to create the key in the console and send it (Authorization: Bearer). Surface to the user as written."
         },
         "plan": {
-          "type": "string"
-        },
-        "usage": {
           "type": "string"
         },
         "note": {
@@ -2582,10 +2564,10 @@
       "$schema": "http://json-schema.org/draft-07/schema#"
     },
     "annotations": {
-      "title": "Issue ThinAir Geo API Key",
-      "readOnlyHint": false,
+      "title": "Get ThinAir Geo API Key Link",
+      "readOnlyHint": true,
       "destructiveHint": false,
-      "idempotentHint": false,
+      "idempotentHint": true,
       "openWorldHint": false
     }
   },
