@@ -6,26 +6,29 @@
       "type": "object",
       "properties": {
         "addresses": {
+          "description": "Array of addresses to geocode (max 50 per batch)",
+          "maxItems": 50,
           "type": "array",
           "items": {
             "type": "string",
             "maxLength": 2000
-          },
-          "maxItems": 50,
-          "description": "Array of addresses to geocode (max 50 per batch)"
+          }
         }
       },
       "required": [
         "addresses"
       ],
-      "additionalProperties": false,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": false
     },
     "outputSchema": {
       "type": "object",
       "properties": {
         "summary": {
           "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
           "additionalProperties": {},
           "description": "Map of scalar facts the LLM should surface verbatim"
         },
@@ -100,7 +103,7 @@
                 "type": "string"
               }
             },
-            "additionalProperties": true
+            "additionalProperties": {}
           }
         },
         "geojson": {
@@ -158,7 +161,7 @@
                         "required": [
                           "type"
                         ],
-                        "additionalProperties": true
+                        "additionalProperties": {}
                       },
                       {
                         "type": "null"
@@ -167,6 +170,9 @@
                   },
                   "properties": {
                     "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
                     "additionalProperties": {}
                   }
                 },
@@ -174,7 +180,7 @@
                   "type",
                   "geometry"
                 ],
-                "additionalProperties": true
+                "additionalProperties": {}
               }
             }
           },
@@ -182,7 +188,7 @@
             "type",
             "features"
           ],
-          "additionalProperties": true
+          "additionalProperties": {}
         },
         "display_hint": {
           "type": "object",
@@ -226,11 +232,11 @@
           "required": [
             "layout"
           ],
-          "additionalProperties": true
+          "additionalProperties": {}
         }
       },
-      "additionalProperties": true,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": {}
     },
     "annotations": {
       "title": "Batch Geocode",
@@ -246,30 +252,36 @@
       "type": "object",
       "properties": {
         "from": {
+          "description": "Origin: address string ('Houston, TX'), 'lat,lon' string, or { lat, lon } object",
           "type": "string",
           "minLength": 1,
-          "maxLength": 2000,
-          "description": "Origin: address string ('Houston, TX'), 'lat,lon' string, or { lat, lon } object"
+          "maxLength": 2000
         },
         "to": {
-          "$ref": "#/properties/from",
-          "description": "Destination: address string ('Houston, TX'), 'lat,lon' string, or { lat, lon } object"
+          "description": "Destination: address string ('Houston, TX'), 'lat,lon' string, or { lat, lon } object",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
         },
         "via": {
+          "description": "Intermediate stops in order; same shape as from/to. Up to 48 waypoints (max 50 total locations).",
+          "maxItems": 48,
           "type": "array",
           "items": {
-            "$ref": "#/properties/from"
-          },
-          "maxItems": 48,
-          "description": "Intermediate stops in order; same shape as from/to. Up to 48 waypoints (max 50 total locations)."
+            "description": "Intermediate stop: address string ('Houston, TX'), 'lat,lon' string, or { lat, lon } object",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
         },
         "alternates": {
+          "description": "Number of genuine motorized alternate routes to request (0, 1, or 2). Positive values require no via waypoints.",
           "type": "integer",
           "minimum": 0,
-          "maximum": 2,
-          "description": "Number of genuine motorized alternate routes to request (0, 1, or 2). Positive values require no via waypoints."
+          "maximum": 2
         },
         "costing": {
+          "description": "Transport mode (default: auto). Use 'truck' for commercial vehicles",
           "type": "string",
           "enum": [
             "auto",
@@ -277,118 +289,120 @@
             "bicycle",
             "pedestrian",
             "motorcycle"
-          ],
-          "description": "Transport mode (default: auto). Use 'truck' for commercial vehicles"
+          ]
         },
         "vehicle_profile": {
+          "description": "Preset vehicle profile (10): DRY_VAN_53, FLATBED_48, FLATBED_40, STEP_DECK, TANKER, BOX_TRUCK_26, AUTO_CARRIER, SPRINTER_VAN, DOUBLE_TRAILER, OVERSIZE. Each sets height/weight/length/axle_count for that vehicle class in one parameter (e.g. DRY_VAN_53 = 4.11m tall, 36.3t, 22.25m long, 5 axles; OVERSIZE = 4.88m tall, 3.66m wide, 45.36t). The response echoes the applied dims in costing_options.truck. Any individual truck_height/truck_weight/etc. overrides a single field.",
           "type": "string",
-          "maxLength": 64,
-          "description": "Preset vehicle profile (10): DRY_VAN_53, FLATBED_48, FLATBED_40, STEP_DECK, TANKER, BOX_TRUCK_26, AUTO_CARRIER, SPRINTER_VAN, DOUBLE_TRAILER, OVERSIZE. Each sets height/weight/length/axle_count for that vehicle class in one parameter (e.g. DRY_VAN_53 = 4.11m tall, 36.3t, 22.25m long, 5 axles; OVERSIZE = 4.88m tall, 3.66m wide, 45.36t). The response echoes the applied dims in costing_options.truck. Any individual truck_height/truck_weight/etc. overrides a single field."
+          "maxLength": 64
         },
         "truck_height": {
+          "description": "Truck height in meters (e.g. 4.11m = 13'6\"). Triggers bridge avoidance",
           "type": "number",
           "minimum": 0,
-          "maximum": 30,
-          "description": "Truck height in meters (e.g. 4.11m = 13'6\"). Triggers bridge avoidance"
+          "maximum": 30
         },
         "truck_weight": {
+          "description": "Truck weight in metric tons (e.g. 36.3t = 80,000 lbs). Triggers weight-restricted road avoidance",
           "type": "number",
           "minimum": 0,
-          "maximum": 200,
-          "description": "Truck weight in metric tons (e.g. 36.3t = 80,000 lbs). Triggers weight-restricted road avoidance"
+          "maximum": 200
         },
         "truck_width": {
+          "description": "Truck width in meters (e.g. 2.6m = 8'6\")",
           "type": "number",
           "minimum": 0,
-          "maximum": 10,
-          "description": "Truck width in meters (e.g. 2.6m = 8'6\")"
+          "maximum": 10
         },
         "truck_length": {
+          "description": "Truck length in meters (e.g. 16.2m = 53')",
           "type": "number",
           "minimum": 0,
-          "maximum": 60,
-          "description": "Truck length in meters (e.g. 16.2m = 53')"
+          "maximum": 60
         },
         "hazmat": {
-          "type": "boolean",
-          "description": "Set true when transporting hazardous materials to avoid restricted routes"
+          "description": "Set true when transporting hazardous materials to avoid restricted routes",
+          "type": "boolean"
         },
         "axle_load": {
+          "description": "Axle weight in metric tons (e.g. 9.07t = 20,000 lbs per axle)",
           "type": "number",
           "minimum": 0,
-          "maximum": 100,
-          "description": "Axle weight in metric tons (e.g. 9.07t = 20,000 lbs per axle)"
+          "maximum": 100
         },
         "axle_count": {
+          "description": "Number of axles (default 5 for semi-trailer)",
           "type": "number",
           "minimum": 1,
-          "maximum": 20,
-          "description": "Number of axles (default 5 for semi-trailer)"
+          "maximum": 20
         },
         "top_speed": {
+          "description": "Maximum speed in km/h (default 105 for trucks)",
           "type": "number",
           "minimum": 0,
-          "maximum": 300,
-          "description": "Maximum speed in km/h (default 105 for trucks)"
+          "maximum": 300
         },
         "use_highways": {
+          "description": "Highway preference 0-1 (0=avoid, 1=prefer)",
           "type": "number",
           "minimum": 0,
-          "maximum": 1,
-          "description": "Highway preference 0-1 (0=avoid, 1=prefer)"
+          "maximum": 1
         },
         "use_ferry": {
+          "description": "Ferry preference 0-1 (0=avoid, 1=allow)",
           "type": "number",
           "minimum": 0,
-          "maximum": 1,
-          "description": "Ferry preference 0-1 (0=avoid, 1=allow)"
+          "maximum": 1
         },
         "avoid_tolls": {
-          "type": "boolean",
-          "description": "Avoid toll roads when user requests toll-free routing"
+          "description": "Avoid toll roads when user requests toll-free routing",
+          "type": "boolean"
         },
         "include_traffic": {
-          "type": "boolean",
-          "description": "Apply post-route live-traffic ETA enrichment (default: true). Traffic does not change the returned path; truck adjustments are slowdown-only."
+          "description": "Apply post-route live-traffic ETA enrichment (default: true). Traffic does not change the returned path; truck adjustments are slowdown-only.",
+          "type": "boolean"
         },
         "include_weather": {
-          "type": "boolean",
-          "description": "Attach current conditions sampled along the route corridor (default: false). Post-route annotation only: weather does not change the returned path. Extra upstream lookup, opt-in only."
+          "description": "Attach current conditions sampled along the route corridor (default: false). Post-route annotation only: weather does not change the returned path. Extra upstream lookup, opt-in only.",
+          "type": "boolean"
         },
         "include_elevation": {
-          "type": "boolean",
-          "description": "When true, include available route elevation fields. Point elevation may be returned for the origin and destination. Cumulative gain/loss is returned only when route-profile elevation is available."
+          "description": "When true, include available route elevation fields. Point elevation may be returned for the origin and destination. Cumulative gain/loss is returned only when route-profile elevation is available.",
+          "type": "boolean"
         },
         "include_geometry": {
+          "description": "Route geometry shape control. \"none\" returns origin/destination Points only. \"encoded\" returns an encoded polyline6 string in a top-level `geometry` field plus origin/destination Points (≈95% smaller than raw GeoJSON; decode with @mapbox/polyline at precision 6). \"full\" emits decoded coordinates as a LineString in `geojson.features[0]`. When omitted (default), small routes use \"full\" and long routes auto-downgrade to \"encoded\" with a `geometry_truncated` warning.",
           "type": "string",
           "enum": [
             "none",
             "encoded",
             "full"
-          ],
-          "description": "Route geometry shape control. \"none\" returns origin/destination Points only. \"encoded\" returns an encoded polyline6 string in a top-level `geometry` field plus origin/destination Points (≈95% smaller than raw GeoJSON; decode with @mapbox/polyline at precision 6). \"full\" emits decoded coordinates as a LineString in `geojson.features[0]`. When omitted (default), small routes use \"full\" and long routes auto-downgrade to \"encoded\" with a `geometry_truncated` warning."
+          ]
         },
         "units": {
+          "description": "Distance units (default: miles). Accepts 'km'/'mi' as aliases.",
           "type": "string",
           "enum": [
             "miles",
             "kilometers"
-          ],
-          "description": "Distance units (default: miles). Accepts 'km'/'mi' as aliases."
+          ]
         }
       },
       "required": [
         "from",
         "to"
       ],
-      "additionalProperties": false,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": false
     },
     "outputSchema": {
       "type": "object",
       "properties": {
         "summary": {
           "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
           "additionalProperties": {},
           "description": "Map of scalar facts the LLM should surface verbatim"
         },
@@ -396,6 +410,9 @@
           "type": "array",
           "items": {
             "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
             "additionalProperties": {}
           }
         },
@@ -423,7 +440,7 @@
                 "type": "number"
               }
             },
-            "additionalProperties": true
+            "additionalProperties": {}
           }
         },
         "geojson": {
@@ -481,7 +498,7 @@
                         "required": [
                           "type"
                         ],
-                        "additionalProperties": true
+                        "additionalProperties": {}
                       },
                       {
                         "type": "null"
@@ -490,6 +507,9 @@
                   },
                   "properties": {
                     "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
                     "additionalProperties": {}
                   }
                 },
@@ -497,7 +517,7 @@
                   "type",
                   "geometry"
                 ],
-                "additionalProperties": true
+                "additionalProperties": {}
               }
             }
           },
@@ -505,7 +525,7 @@
             "type",
             "features"
           ],
-          "additionalProperties": true
+          "additionalProperties": {}
         },
         "display_hint": {
           "type": "object",
@@ -549,10 +569,13 @@
           "required": [
             "layout"
           ],
-          "additionalProperties": true
+          "additionalProperties": {}
         },
         "costing_options": {
           "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
           "additionalProperties": {}
         },
         "traffic_route": {
@@ -620,20 +643,125 @@
                     "duration_seconds",
                     "maneuvers"
                   ],
-                  "additionalProperties": true
+                  "additionalProperties": {}
                 }
               },
               "maneuvers": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/properties/items/items"
+                  "type": "object",
+                  "properties": {
+                    "instruction": {
+                      "type": "string"
+                    },
+                    "distance": {
+                      "type": [
+                        "number",
+                        "string"
+                      ]
+                    },
+                    "time": {
+                      "type": "number"
+                    },
+                    "type": {
+                      "type": "number"
+                    },
+                    "begin_shape_index": {
+                      "type": "number"
+                    }
+                  },
+                  "additionalProperties": {}
                 }
               },
               "geojson": {
-                "$ref": "#/properties/geojson"
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "const": "FeatureCollection"
+                  },
+                  "features": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "const": "Feature"
+                        },
+                        "id": {
+                          "type": [
+                            "string",
+                            "number"
+                          ]
+                        },
+                        "geometry": {
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string",
+                                      "enum": [
+                                        "Point",
+                                        "LineString",
+                                        "Polygon",
+                                        "MultiPoint",
+                                        "MultiLineString",
+                                        "MultiPolygon",
+                                        "GeometryCollection"
+                                      ]
+                                    },
+                                    {
+                                      "type": "string"
+                                    }
+                                  ]
+                                },
+                                "coordinates": {},
+                                "geometries": {
+                                  "type": "array",
+                                  "items": {}
+                                }
+                              },
+                              "required": [
+                                "type"
+                              ],
+                              "additionalProperties": {}
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "properties": {
+                          "type": "object",
+                          "propertyNames": {
+                            "type": "string"
+                          },
+                          "additionalProperties": {}
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "geometry"
+                      ],
+                      "additionalProperties": {}
+                    }
+                  }
+                },
+                "required": [
+                  "type",
+                  "features"
+                ],
+                "additionalProperties": {}
               },
               "geometry": {
                 "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
                 "additionalProperties": {}
               }
             },
@@ -644,22 +772,22 @@
               "legs",
               "maneuvers"
             ],
-            "additionalProperties": true
+            "additionalProperties": {}
           }
         },
         "timezone_start": {
+          "description": "IANA timezone at the route origin, or null when unresolved. Contains information from timezone-boundary-builder, which is made available under the Open Database License (ODbL) v1.0. Timezone boundaries © OpenStreetMap contributors. US legal-zone cross-check: U.S. Department of Transportation, Bureau of Transportation Statistics (public domain).",
           "type": [
             "string",
             "null"
-          ],
-          "description": "IANA timezone at the route origin, or null when unresolved. Contains information from timezone-boundary-builder, which is made available under the Open Database License (ODbL) v1.0. Timezone boundaries © OpenStreetMap contributors. US legal-zone cross-check: U.S. Department of Transportation, Bureau of Transportation Statistics (public domain)."
+          ]
         },
         "timezone_end": {
+          "description": "IANA timezone at the route destination, or null when unresolved. Contains information from timezone-boundary-builder, which is made available under the Open Database License (ODbL) v1.0. Timezone boundaries © OpenStreetMap contributors. US legal-zone cross-check: U.S. Department of Transportation, Bureau of Transportation Statistics (public domain).",
           "type": [
             "string",
             "null"
-          ],
-          "description": "IANA timezone at the route destination, or null when unresolved. Contains information from timezone-boundary-builder, which is made available under the Open Database License (ODbL) v1.0. Timezone boundaries © OpenStreetMap contributors. US legal-zone cross-check: U.S. Department of Transportation, Bureau of Transportation Statistics (public domain)."
+          ]
         },
         "timezone_start_status": {
           "type": "string",
@@ -752,22 +880,22 @@
           "description": "Arrival time derived from the base duration, expressed as an ISO 8601 UTC timestamp."
         },
         "base_arrival_local": {
+          "description": "Arrival time derived from the base duration in the destination's local time, or null when the local timezone is unavailable.",
           "type": [
             "string",
             "null"
-          ],
-          "description": "Arrival time derived from the base duration in the destination's local time, or null when the local timezone is unavailable."
+          ]
         },
         "effective_arrival_utc": {
           "type": "string",
           "description": "Authoritative arrival time for this response, expressed as an ISO 8601 UTC timestamp."
         },
         "effective_arrival_local": {
+          "description": "Authoritative arrival time in the destination's local time, or null when the local timezone is unavailable.",
           "type": [
             "string",
             "null"
-          ],
-          "description": "Authoritative arrival time in the destination's local time, or null when the local timezone is unavailable."
+          ]
         },
         "traffic_provenance": {
           "type": "object",
@@ -806,53 +934,53 @@
               "description": "Whether traffic actually changed the duration returned by THIS request. False when no traffic adjustment was applied, even if traffic was requested and fetched successfully."
             },
             "source_as_of": {
+              "description": "DEPRECATED since 2026-09-24, always null. The traffic source provides no observation timestamp, so this field can never be filled honestly. See `retrieved_at` for when ThinAir fetched the traffic evidence (not when it was observed). Will be removed in /v2.",
               "type": [
                 "string",
                 "null"
-              ],
-              "description": "DEPRECATED since 2026-09-24, always null. The traffic source provides no observation timestamp, so this field can never be filled honestly. See `retrieved_at` for when ThinAir fetched the traffic evidence (not when it was observed). Will be removed in /v2."
+              ]
             },
             "route_coverage_pct": {
+              "description": "Percentage of the route's distance backed by a live traffic observation. This is a MEASURED figure, not an attributed one: it sums the length of road each traffic observation actually matched and divides by the route distance. Coverage can range from sparse observations to most of a corridor, depending on the evidence available for this request; use the returned value rather than assuming a sampling pattern. A low percentage does not mean the ETA is unreliable; it means most of the route's duration comes from the road network's own speeds rather than from live observation. Null when no live traffic observation carried a measurable length.",
               "type": [
                 "number",
                 "null"
-              ],
-              "description": "Percentage of the route's distance backed by a live traffic observation. This is a MEASURED figure, not an attributed one: it sums the length of road each traffic observation actually matched and divides by the route distance. Coverage can range from sparse observations to most of a corridor, depending on the evidence available for this request; use the returned value rather than assuming a sampling pattern. A low percentage does not mean the ETA is unreliable; it means most of the route's duration comes from the road network's own speeds rather than from live observation. Null when no live traffic observation carried a measurable length."
+              ]
             },
             "freshness_seconds": {
+              "description": "DEPRECATED since 2026-09-24, always null — same reason as `source_as_of`. See `retrieval_age_seconds` for the acquisition age ThinAir CAN report honestly. Will be removed in /v2.",
               "type": [
                 "number",
                 "null"
-              ],
-              "description": "DEPRECATED since 2026-09-24, always null — same reason as `source_as_of`. See `retrieval_age_seconds` for the acquisition age ThinAir CAN report honestly. Will be removed in /v2."
+              ]
             },
             "retrieved_at": {
+              "description": "ISO 8601 time when ThinAir fetched the traffic evidence behind this response (point or tile). This is acquisition metadata, not the time the traffic was observed — the traffic source reports no observation time (see `source_as_of`). Null when no consulted sample's acquisition time was determinable.",
               "type": [
                 "string",
                 "null"
-              ],
-              "description": "ISO 8601 time when ThinAir fetched the traffic evidence behind this response (point or tile). This is acquisition metadata, not the time the traffic was observed — the traffic source reports no observation time (see `source_as_of`). Null when no consulted sample's acquisition time was determinable."
+              ]
             },
             "retrieval_age_seconds": {
+              "description": "Age, in seconds, of `retrieved_at` — how long ago ThinAir fetched the traffic evidence behind this response (point or tile). This is acquisition/cache age, not traffic-observation freshness. Null under the same condition as `retrieved_at`.",
               "type": [
                 "number",
                 "null"
-              ],
-              "description": "Age, in seconds, of `retrieved_at` — how long ago ThinAir fetched the traffic evidence behind this response (point or tile). This is acquisition/cache age, not traffic-observation freshness. Null under the same condition as `retrieved_at`."
+              ]
             },
             "routing_release_id": {
+              "description": "Identifier of the road-network build that produced this route. Null today: the routing engine does not report one.",
               "type": [
                 "string",
                 "null"
-              ],
-              "description": "Identifier of the road-network build that produced this route. Null today: the routing engine does not report one."
+              ]
             },
             "overlay_epoch": {
+              "description": "Identifier of the live-speed overlay applied to the road network. Null today: no live-speed overlay is in use.",
               "type": [
                 "string",
                 "null"
-              ],
-              "description": "Identifier of the live-speed overlay applied to the road network. Null today: no live-speed overlay is in use."
+              ]
             }
           },
           "required": [
@@ -881,8 +1009,8 @@
         "effective_arrival_local",
         "traffic_provenance"
       ],
-      "additionalProperties": true,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": {}
     },
     "annotations": {
       "title": "Directions",
@@ -898,28 +1026,29 @@
       "type": "object",
       "properties": {
         "origins": {
+          "minItems": 1,
+          "maxItems": 25,
           "type": "array",
           "items": {
             "type": "string",
             "minLength": 1,
             "maxLength": 2000
           },
-          "minItems": 1,
-          "maxItems": 25,
           "description": "Origin endpoints (1–25): address or 'lat,lon'"
         },
         "destinations": {
+          "minItems": 1,
+          "maxItems": 25,
           "type": "array",
           "items": {
             "type": "string",
             "minLength": 1,
             "maxLength": 2000
           },
-          "minItems": 1,
-          "maxItems": 25,
           "description": "Destination endpoints (1–25): address or 'lat,lon'"
         },
         "costing": {
+          "description": "Transport mode (default auto)",
           "type": "string",
           "enum": [
             "auto",
@@ -927,34 +1056,35 @@
             "bicycle",
             "pedestrian",
             "motorcycle"
-          ],
-          "description": "Transport mode (default auto)"
+          ]
         },
         "units": {
+          "description": "Distance units (default kilometers)",
           "type": "string",
           "enum": [
             "miles",
             "kilometers"
-          ],
-          "description": "Distance units (default kilometers)"
+          ]
         }
       },
       "required": [
         "origins",
         "destinations"
       ],
-      "additionalProperties": false,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": false
     },
     "outputSchema": {
       "type": "object",
       "properties": {
         "origins": {
           "type": "array",
+          "items": {},
           "description": "Geocoded origin locations"
         },
         "destinations": {
           "type": "array",
+          "items": {},
           "description": "Geocoded destination locations"
         },
         "matrix": {
@@ -1035,8 +1165,8 @@
         "units",
         "costing"
       ],
-      "additionalProperties": false,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": false
     },
     "annotations": {
       "title": "Distance Matrix",
@@ -1052,28 +1182,29 @@
       "type": "object",
       "properties": {
         "location": {
+          "description": "Center point address or 'lat,lon'",
           "type": "string",
-          "maxLength": 2000,
-          "description": "Center point address or 'lat,lon'"
+          "maxLength": 2000
         },
         "lat": {
+          "description": "Latitude of center point",
           "type": "number",
           "minimum": -90,
-          "maximum": 90,
-          "description": "Latitude of center point"
+          "maximum": 90
         },
         "lon": {
+          "description": "Longitude of center point",
           "type": "number",
           "minimum": -180,
-          "maximum": 180,
-          "description": "Longitude of center point"
+          "maximum": 180
         },
         "layers": {
+          "description": "Comma-separated administrative layers: locality (default), neighbourhood, borough, county, region. venue, address, street and unknown names are rejected with a structured invalid_layer error — use search_places for venues. Radius policy is per layer: locality/county/region default 150 km and cap at 500 km; neighbourhood/borough default 25 km and cap at 100 km; a mixed request takes the tightest default and cap. With several layers, `size` is split evenly between them (remainder to the first) so one dense layer cannot flood the result.",
           "type": "string",
-          "maxLength": 200,
-          "description": "Comma-separated administrative layers: locality (default), neighbourhood, borough, county, region. venue, address, street and unknown names are rejected with a structured invalid_layer error — use search_places for venues. Radius policy is per layer: locality/county/region default 150 km and cap at 500 km; neighbourhood/borough default 25 km and cap at 100 km; a mixed request takes the tightest default and cap. With several layers, `size` is split evenly between them (remainder to the first) so one dense layer cannot flood the result."
+          "maxLength": 200
         },
         "radius": {
+          "description": "Search radius — e.g. radius: 30, units: 'miles'. Bare numbers are miles unless units is set; kilometers via units or a km suffix ('50km'); aliases mi/km/imperial/metric. A value carrying its own unit suffix ('50km', '30mi') is also accepted for compatibility and its suffix wins. Per-layer policy: locality/county/region default 150 km (93.206 mi) and cap at 500 km (~310 mi); neighbourhood/borough default 25 km (15.534 mi) and cap at 100 km (~62 mi); a request naming several layers takes the tightest default and cap among them. Numeric values above 500 fail input validation before the tool runs; a string form over the maximum ('600km') or an in-range number that is over the cap once read as miles (e.g. 400, or 400 with units 'miles' — 644 km) returns a structured radius_exceeds_max error naming the governing cap instead of results.",
           "anyOf": [
             {
               "type": "number",
@@ -1084,52 +1215,54 @@
               "type": "string",
               "maxLength": 32
             }
-          ],
-          "description": "Search radius — e.g. radius: 30, units: 'miles'. Bare numbers are miles unless units is set; kilometers via units or a km suffix ('50km'); aliases mi/km/imperial/metric. A value carrying its own unit suffix ('50km', '30mi') is also accepted for compatibility and its suffix wins. Per-layer policy: locality/county/region default 150 km (93.206 mi) and cap at 500 km (~310 mi); neighbourhood/borough default 25 km (15.534 mi) and cap at 100 km (~62 mi); a request naming several layers takes the tightest default and cap among them. Numeric values above 500 fail input validation before the tool runs; a string form over the maximum ('600km') or an in-range number that is over the cap once read as miles (e.g. 400, or 400 with units 'miles' — 644 km) returns a structured radius_exceeds_max error naming the governing cap instead of results."
+          ]
         },
         "units": {
+          "description": "Units for a bare numeric `radius`: miles (default) or kilometers. Accepts the aliases mi, mile, imperial (miles) and km, kilometer, kilometre, kilometres, metric (kilometers), any case; echoed as miles|kilometers. Ignored when `radius` already carries a unit suffix; a contradicting pair is rejected. Does not supply a radius on its own (the default is per layer — 150 km for locality/county/region, 25 km for neighbourhood/borough; tightest wins when mixed) but selects the display unit of the meta.radius / meta.units echo.",
           "type": "string",
           "enum": [
             "miles",
             "kilometers"
-          ],
-          "description": "Units for a bare numeric `radius`: miles (default) or kilometers. Accepts the aliases mi, mile, imperial (miles) and km, kilometer, kilometre, kilometres, metric (kilometers), any case; echoed as miles|kilometers. Ignored when `radius` already carries a unit suffix; a contradicting pair is rejected. Does not supply a radius on its own (the default is per layer — 150 km for locality/county/region, 25 km for neighbourhood/borough; tightest wins when mixed) but selects the display unit of the meta.radius / meta.units echo."
+          ]
         },
         "size": {
+          "description": "Max results (default 10, max 50)",
           "type": "number",
           "minimum": 1,
-          "maximum": 50,
-          "description": "Max results (default 10, max 50)"
+          "maximum": 50
         },
         "min_population": {
+          "description": "Minimum population filter, applied JS-side to whichever layers are served (locality, neighbourhood, borough, county, region).",
           "type": "number",
           "minimum": 0,
-          "maximum": 10000000000,
-          "description": "Minimum population filter, applied JS-side to whichever layers are served (locality, neighbourhood, borough, county, region)."
+          "maximum": 10000000000
         },
         "sort": {
+          "description": "Ranking basis. Default `population` — significance (population where the source has it) with distance as the tiebreak. `distance` is nearest first; `combined` blends population against a distance decay. The basis applied is echoed in meta.ranking.",
           "type": "string",
           "enum": [
             "population",
             "distance",
             "combined"
-          ],
-          "description": "Ranking basis. Default `population` — significance (population where the source has it) with distance as the tiebreak. `distance` is nearest first; `combined` blends population against a distance decay. The basis applied is echoed in meta.ranking."
+          ]
         },
         "boundary_country": {
+          "description": "ISO country code to restrict results (alpha-2 or alpha-3)",
           "type": "string",
-          "maxLength": 3,
-          "description": "ISO country code to restrict results (alpha-2 or alpha-3)"
+          "maxLength": 3
         }
       },
-      "additionalProperties": false,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": false
     },
     "outputSchema": {
       "type": "object",
       "properties": {
         "summary": {
           "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
           "additionalProperties": {},
           "description": "Map of scalar facts the LLM should surface verbatim"
         },
@@ -1183,7 +1316,7 @@
                   "lat",
                   "lon"
                 ],
-                "additionalProperties": true
+                "additionalProperties": {}
               },
               "region": {
                 "type": "string"
@@ -1192,7 +1325,7 @@
                 "type": "string"
               }
             },
-            "additionalProperties": true
+            "additionalProperties": {}
           }
         },
         "geojson": {
@@ -1250,7 +1383,7 @@
                         "required": [
                           "type"
                         ],
-                        "additionalProperties": true
+                        "additionalProperties": {}
                       },
                       {
                         "type": "null"
@@ -1259,6 +1392,9 @@
                   },
                   "properties": {
                     "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
                     "additionalProperties": {}
                   }
                 },
@@ -1266,7 +1402,7 @@
                   "type",
                   "geometry"
                 ],
-                "additionalProperties": true
+                "additionalProperties": {}
               }
             }
           },
@@ -1274,7 +1410,7 @@
             "type",
             "features"
           ],
-          "additionalProperties": true
+          "additionalProperties": {}
         },
         "display_hint": {
           "type": "object",
@@ -1318,7 +1454,7 @@
           "required": [
             "layout"
           ],
-          "additionalProperties": true
+          "additionalProperties": {}
         },
         "meta": {
           "type": "object",
@@ -1330,7 +1466,11 @@
               "type": "number"
             },
             "units": {
-              "$ref": "#/properties/items/items/properties/distance_unit"
+              "type": "string",
+              "enum": [
+                "miles",
+                "kilometers"
+              ]
             },
             "layers": {
               "type": "array",
@@ -1348,11 +1488,11 @@
               "type": "integer"
             }
           },
-          "additionalProperties": true
+          "additionalProperties": {}
         }
       },
-      "additionalProperties": true,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": {}
     },
     "annotations": {
       "title": "Explore",
@@ -1373,45 +1513,48 @@
           "description": "Address, place name, street, intersection (e.g. 'Broadway and 42nd Street New York'), or free-form location text"
         },
         "size": {
+          "description": "Number of candidates to return (default 5, max 40)",
           "type": "number",
           "minimum": 1,
-          "maximum": 40,
-          "description": "Number of candidates to return (default 5, max 40)"
+          "maximum": 40
         },
         "focus_lat": {
+          "description": "Bias results near this latitude — use when user says 'near me' or 'close to'",
           "type": "number",
           "minimum": -90,
-          "maximum": 90,
-          "description": "Bias results near this latitude — use when user says 'near me' or 'close to'"
+          "maximum": 90
         },
         "focus_lon": {
+          "description": "Bias results near this longitude",
           "type": "number",
           "minimum": -180,
-          "maximum": 180,
-          "description": "Bias results near this longitude"
+          "maximum": 180
         },
         "layers": {
+          "description": "Restrict to: address, street, venue, locality. Use layers=street when user clearly wants a street entity. Use layers=venue for stadiums, monuments, parks, and named POIs (e.g. 'Minute Maid Park', 'Lambeau Field', 'Statue of Liberty') — bypasses address-parser tokenization that otherwise resolves venue+state to the state region centroid",
           "type": "string",
-          "maxLength": 200,
-          "description": "Restrict to: address, street, venue, locality. Use layers=street when user clearly wants a street entity. Use layers=venue for stadiums, monuments, parks, and named POIs (e.g. 'Minute Maid Park', 'Lambeau Field', 'Statue of Liberty') — bypasses address-parser tokenization that otherwise resolves venue+state to the state region centroid"
+          "maxLength": 200
         },
         "boundary_country": {
+          "description": "ISO country code to reduce ambiguity (alpha-2 or alpha-3)",
           "type": "string",
-          "maxLength": 3,
-          "description": "ISO country code to reduce ambiguity (alpha-2 or alpha-3)"
+          "maxLength": 3
         }
       },
       "required": [
         "query"
       ],
-      "additionalProperties": false,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": false
     },
     "outputSchema": {
       "type": "object",
       "properties": {
         "summary": {
           "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
           "additionalProperties": {},
           "description": "Map of scalar facts the LLM should surface verbatim"
         },
@@ -1480,11 +1623,12 @@
                 "type": "string"
               },
               "confidence_scope": {
+                "description": "What `confidence` is scoped to. `query_to_candidate` means it scores how well this candidate matches the submitted query — it is NOT a probability that the place is real, that the address is correct, or that mail would arrive. Fixed value today; treat it as a closed set that may gain members.",
                 "type": "string",
-                "const": "query_to_candidate",
-                "description": "What `confidence` is scoped to. `query_to_candidate` means it scores how well this candidate matches the submitted query — it is NOT a probability that the place is real, that the address is correct, or that mail would arrive. Fixed value today; treat it as a closed set that may gain members."
+                "const": "query_to_candidate"
               },
               "address_evidence": {
+                "description": "What THIS CANDIDATE carries, component by component — `matched` (a real value is present), `partial` (only a coarser or derived stand-in, e.g. an interpolated house number or a locality falling back to its administrative parent), `absent` (nothing). This describes the result, NOT a comparison against your query: the engine returns no per-component match data, and re-parsing your text here would mean two parsers disagreeing about the same string. Derived from the feature, never from `confidence`.",
                 "type": "object",
                 "properties": {
                   "house_number": {
@@ -1496,13 +1640,28 @@
                     ]
                   },
                   "street": {
-                    "$ref": "#/properties/items/items/properties/address_evidence/properties/house_number"
+                    "type": "string",
+                    "enum": [
+                      "matched",
+                      "partial",
+                      "absent"
+                    ]
                   },
                   "locality": {
-                    "$ref": "#/properties/items/items/properties/address_evidence/properties/house_number"
+                    "type": "string",
+                    "enum": [
+                      "matched",
+                      "partial",
+                      "absent"
+                    ]
                   },
                   "region": {
-                    "$ref": "#/properties/items/items/properties/address_evidence/properties/house_number"
+                    "type": "string",
+                    "enum": [
+                      "matched",
+                      "partial",
+                      "absent"
+                    ]
                   },
                   "postal_code": {
                     "type": "string",
@@ -1521,36 +1680,36 @@
                   "region",
                   "postal_code"
                 ],
-                "additionalProperties": false,
-                "description": "What THIS CANDIDATE carries, component by component — `matched` (a real value is present), `partial` (only a coarser or derived stand-in, e.g. an interpolated house number or a locality falling back to its administrative parent), `absent` (nothing). This describes the result, NOT a comparison against your query: the engine returns no per-component match data, and re-parsing your text here would mean two parsers disagreeing about the same string. Derived from the feature, never from `confidence`."
+                "additionalProperties": false
               },
               "postal_code": {
+                "description": "An eligible US ZIP5 read from the selected result's own postal-code field. While origin enforcement is active this field is emitted ONLY when the engine stamped the value as coming from the address record itself (`source_record` provenance); a value inherited from a parent area, or a result cached before that evidence existed, is omitted rather than emitted without provenance — so an absent ZIP under enforcement means \"not proven for this record\", not \"no such ZIP\". Provenance describes only WHERE the value came from. It is not a postal operator check of any kind — no certification, no address-quality rating, and no statement about whether mail would arrive — so a syntactically correct, correctly-sourced value can still be wrong for the address. Also omitted when unavailable or unsuitable for five-digit form. US address results only. Distinct from `address_evidence.postal_code`, which is a presence STATUS rather than a value. On reverse geocoding this describes the RETURNED ADDRESS — it is not a postal assignment to the coordinate you supplied.",
                 "type": "string",
-                "pattern": "^[0-9]{5}$",
-                "description": "An eligible US ZIP5 read from the selected result's own postal-code field. While origin enforcement is active this field is emitted ONLY when the engine stamped the value as coming from the address record itself (`source_record` provenance); a value inherited from a parent area, or a result cached before that evidence existed, is omitted rather than emitted without provenance — so an absent ZIP under enforcement means \"not proven for this record\", not \"no such ZIP\". Provenance describes only WHERE the value came from. It is not a postal operator check of any kind — no certification, no address-quality rating, and no statement about whether mail would arrive — so a syntactically correct, correctly-sourced value can still be wrong for the address. Also omitted when unavailable or unsuitable for five-digit form. US address results only. Distinct from `address_evidence.postal_code`, which is a presence STATUS rather than a value. On reverse geocoding this describes the RETURNED ADDRESS — it is not a postal assignment to the coordinate you supplied."
+                "pattern": "^[0-9]{5}$"
               },
               "postal_input_match": {
+                "description": "STRUCTURED GEOCODING ONLY (`geocode_structured` / `POST /v1/search/structured`); absent from free-text geocoding. Whether the postcode YOU SUBMITTED agrees with this candidate's own postcode — `match` (same five-digit value), `conflict` (they differ), `unavailable` (no comparison was possible). This compares two values already in hand: no lookup, no external reference, and your query text is never parsed to find one. `conflict` does NOT say which side is wrong — your input may name a neighbouring area, the candidate may be a near-miss, or the record's own value may be stale; treat it as a prompt to ask a human, never as a correction to apply automatically. The candidate side counts only when its postcode came from the address record itself; one inherited from a parent area yields `unavailable` rather than a misleading verdict. `unavailable` also covers: nothing submitted, a submitted value not readable as a US five-digit code, and results cached before this field existed.",
                 "type": "string",
                 "enum": [
                   "match",
                   "conflict",
                   "unavailable"
-                ],
-                "description": "STRUCTURED GEOCODING ONLY (`geocode_structured` / `POST /v1/search/structured`); absent from free-text geocoding. Whether the postcode YOU SUBMITTED agrees with this candidate's own postcode — `match` (same five-digit value), `conflict` (they differ), `unavailable` (no comparison was possible). This compares two values already in hand: no lookup, no external reference, and your query text is never parsed to find one. `conflict` does NOT say which side is wrong — your input may name a neighbouring area, the candidate may be a near-miss, or the record's own value may be stale; treat it as a prompt to ask a human, never as a correction to apply automatically. The candidate side counts only when its postcode came from the address record itself; one inherited from a parent area yields `unavailable` rather than a misleading verdict. `unavailable` also covers: nothing submitted, a submitted value not readable as a US five-digit code, and results cached before this field existed."
+                ]
               },
               "address_line1": {
-                "type": "string",
-                "description": "House number and street for an eligible US address result, composed from the result's own components — never parsed from the display label. Absent when the result is not a US street address."
+                "description": "House number and street for an eligible US address result, composed from the result's own components — never parsed from the display label. Absent when the result is not a US street address.",
+                "type": "string"
               },
               "address_line2": {
-                "type": "string",
-                "description": "Unit or suite, only when the source record carries one. A unit supplied in your request is never echoed back here."
+                "description": "Unit or suite, only when the source record carries one. A unit supplied in your request is never echoed back here.",
+                "type": "string"
               },
               "formatted_address": {
-                "type": "string",
-                "description": "Single-line US display form, e.g. `1600 Pennsylvania Avenue NW, Washington, DC 20500, USA`. The postal segment is present only when an eligible ZIP is; its absence never suppresses the street address."
+                "description": "Single-line US display form, e.g. `1600 Pennsylvania Avenue NW, Washington, DC 20500, USA`. The postal segment is present only when an eligible ZIP is; its absence never suppresses the street address.",
+                "type": "string"
               },
               "address_components": {
+                "description": "The same US components the formatted string is built from. Every field is source-established or absent; nothing is inferred or back-filled.",
                 "type": "object",
                 "properties": {
                   "house_number": {
@@ -1578,8 +1737,7 @@
                     "type": "string"
                   }
                 },
-                "additionalProperties": false,
-                "description": "The same US components the formatted string is built from. Every field is source-established or absent; nothing is inferred or back-filled."
+                "additionalProperties": false
               },
               "method": {
                 "type": "string"
@@ -1591,7 +1749,7 @@
                 "type": "number"
               }
             },
-            "additionalProperties": true
+            "additionalProperties": {}
           }
         },
         "geojson": {
@@ -1649,7 +1807,7 @@
                         "required": [
                           "type"
                         ],
-                        "additionalProperties": true
+                        "additionalProperties": {}
                       },
                       {
                         "type": "null"
@@ -1658,6 +1816,9 @@
                   },
                   "properties": {
                     "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
                     "additionalProperties": {}
                   }
                 },
@@ -1665,7 +1826,7 @@
                   "type",
                   "geometry"
                 ],
-                "additionalProperties": true
+                "additionalProperties": {}
               }
             }
           },
@@ -1673,7 +1834,7 @@
             "type",
             "features"
           ],
-          "additionalProperties": true
+          "additionalProperties": {}
         },
         "display_hint": {
           "type": "object",
@@ -1717,7 +1878,7 @@
           "required": [
             "layout"
           ],
-          "additionalProperties": true
+          "additionalProperties": {}
         },
         "precision": {
           "type": "object",
@@ -1759,7 +1920,7 @@
               "required": [
                 "applied"
               ],
-              "additionalProperties": true
+              "additionalProperties": {}
             }
           },
           "required": [
@@ -1768,11 +1929,11 @@
             "required_context",
             "learning_overlay"
           ],
-          "additionalProperties": true
+          "additionalProperties": {}
         }
       },
-      "additionalProperties": true,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": {}
     },
     "annotations": {
       "title": "Geocode",
@@ -1788,67 +1949,70 @@
       "type": "object",
       "properties": {
         "address": {
+          "description": "Street address — house number + street name (e.g. '1600 Pennsylvania Ave NW')",
           "type": "string",
           "minLength": 1,
-          "maxLength": 2000,
-          "description": "Street address — house number + street name (e.g. '1600 Pennsylvania Ave NW')"
+          "maxLength": 2000
         },
         "locality": {
+          "description": "City / town name",
           "type": "string",
           "minLength": 1,
-          "maxLength": 2000,
-          "description": "City / town name"
+          "maxLength": 2000
         },
         "region": {
+          "description": "State / province — full name or abbreviation (e.g. 'TX')",
           "type": "string",
           "minLength": 1,
-          "maxLength": 2000,
-          "description": "State / province — full name or abbreviation (e.g. 'TX')"
+          "maxLength": 2000
         },
         "postalcode": {
+          "description": "Postal / ZIP code",
           "type": "string",
           "minLength": 1,
-          "maxLength": 32,
-          "description": "Postal / ZIP code"
+          "maxLength": 32
         },
         "country": {
+          "description": "ISO 3166-1 alpha-2/alpha-3 country code (full names also resolve)",
           "type": "string",
           "minLength": 2,
-          "maxLength": 64,
-          "description": "ISO 3166-1 alpha-2/alpha-3 country code (full names also resolve)"
+          "maxLength": 64
         },
         "size": {
+          "description": "Number of candidates to return (default 5, max 40)",
           "type": "number",
           "minimum": 1,
-          "maximum": 40,
-          "description": "Number of candidates to return (default 5, max 40)"
+          "maximum": 40
         },
         "boundary_country": {
+          "description": "Scope results to this ISO country code — wins over `country` for boundary filtering",
           "type": "string",
-          "maxLength": 3,
-          "description": "Scope results to this ISO country code — wins over `country` for boundary filtering"
+          "maxLength": 3
         },
         "focus_lat": {
+          "description": "Bias results near this latitude",
           "type": "number",
           "minimum": -90,
-          "maximum": 90,
-          "description": "Bias results near this latitude"
+          "maximum": 90
         },
         "focus_lon": {
+          "description": "Bias results near this longitude",
           "type": "number",
           "minimum": -180,
-          "maximum": 180,
-          "description": "Bias results near this longitude"
+          "maximum": 180
         }
       },
-      "additionalProperties": false,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": false
     },
     "outputSchema": {
       "type": "object",
       "properties": {
         "summary": {
           "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
           "additionalProperties": {},
           "description": "Map of scalar facts the LLM should surface verbatim"
         },
@@ -1917,11 +2081,12 @@
                 "type": "string"
               },
               "confidence_scope": {
+                "description": "What `confidence` is scoped to. `query_to_candidate` means it scores how well this candidate matches the submitted query — it is NOT a probability that the place is real, that the address is correct, or that mail would arrive. Fixed value today; treat it as a closed set that may gain members.",
                 "type": "string",
-                "const": "query_to_candidate",
-                "description": "What `confidence` is scoped to. `query_to_candidate` means it scores how well this candidate matches the submitted query — it is NOT a probability that the place is real, that the address is correct, or that mail would arrive. Fixed value today; treat it as a closed set that may gain members."
+                "const": "query_to_candidate"
               },
               "address_evidence": {
+                "description": "What THIS CANDIDATE carries, component by component — `matched` (a real value is present), `partial` (only a coarser or derived stand-in, e.g. an interpolated house number or a locality falling back to its administrative parent), `absent` (nothing). This describes the result, NOT a comparison against your query: the engine returns no per-component match data, and re-parsing your text here would mean two parsers disagreeing about the same string. Derived from the feature, never from `confidence`.",
                 "type": "object",
                 "properties": {
                   "house_number": {
@@ -1933,13 +2098,28 @@
                     ]
                   },
                   "street": {
-                    "$ref": "#/properties/items/items/properties/address_evidence/properties/house_number"
+                    "type": "string",
+                    "enum": [
+                      "matched",
+                      "partial",
+                      "absent"
+                    ]
                   },
                   "locality": {
-                    "$ref": "#/properties/items/items/properties/address_evidence/properties/house_number"
+                    "type": "string",
+                    "enum": [
+                      "matched",
+                      "partial",
+                      "absent"
+                    ]
                   },
                   "region": {
-                    "$ref": "#/properties/items/items/properties/address_evidence/properties/house_number"
+                    "type": "string",
+                    "enum": [
+                      "matched",
+                      "partial",
+                      "absent"
+                    ]
                   },
                   "postal_code": {
                     "type": "string",
@@ -1958,36 +2138,36 @@
                   "region",
                   "postal_code"
                 ],
-                "additionalProperties": false,
-                "description": "What THIS CANDIDATE carries, component by component — `matched` (a real value is present), `partial` (only a coarser or derived stand-in, e.g. an interpolated house number or a locality falling back to its administrative parent), `absent` (nothing). This describes the result, NOT a comparison against your query: the engine returns no per-component match data, and re-parsing your text here would mean two parsers disagreeing about the same string. Derived from the feature, never from `confidence`."
+                "additionalProperties": false
               },
               "postal_code": {
+                "description": "An eligible US ZIP5 read from the selected result's own postal-code field. While origin enforcement is active this field is emitted ONLY when the engine stamped the value as coming from the address record itself (`source_record` provenance); a value inherited from a parent area, or a result cached before that evidence existed, is omitted rather than emitted without provenance — so an absent ZIP under enforcement means \"not proven for this record\", not \"no such ZIP\". Provenance describes only WHERE the value came from. It is not a postal operator check of any kind — no certification, no address-quality rating, and no statement about whether mail would arrive — so a syntactically correct, correctly-sourced value can still be wrong for the address. Also omitted when unavailable or unsuitable for five-digit form. US address results only. Distinct from `address_evidence.postal_code`, which is a presence STATUS rather than a value. On reverse geocoding this describes the RETURNED ADDRESS — it is not a postal assignment to the coordinate you supplied.",
                 "type": "string",
-                "pattern": "^[0-9]{5}$",
-                "description": "An eligible US ZIP5 read from the selected result's own postal-code field. While origin enforcement is active this field is emitted ONLY when the engine stamped the value as coming from the address record itself (`source_record` provenance); a value inherited from a parent area, or a result cached before that evidence existed, is omitted rather than emitted without provenance — so an absent ZIP under enforcement means \"not proven for this record\", not \"no such ZIP\". Provenance describes only WHERE the value came from. It is not a postal operator check of any kind — no certification, no address-quality rating, and no statement about whether mail would arrive — so a syntactically correct, correctly-sourced value can still be wrong for the address. Also omitted when unavailable or unsuitable for five-digit form. US address results only. Distinct from `address_evidence.postal_code`, which is a presence STATUS rather than a value. On reverse geocoding this describes the RETURNED ADDRESS — it is not a postal assignment to the coordinate you supplied."
+                "pattern": "^[0-9]{5}$"
               },
               "postal_input_match": {
+                "description": "STRUCTURED GEOCODING ONLY (`geocode_structured` / `POST /v1/search/structured`); absent from free-text geocoding. Whether the postcode YOU SUBMITTED agrees with this candidate's own postcode — `match` (same five-digit value), `conflict` (they differ), `unavailable` (no comparison was possible). This compares two values already in hand: no lookup, no external reference, and your query text is never parsed to find one. `conflict` does NOT say which side is wrong — your input may name a neighbouring area, the candidate may be a near-miss, or the record's own value may be stale; treat it as a prompt to ask a human, never as a correction to apply automatically. The candidate side counts only when its postcode came from the address record itself; one inherited from a parent area yields `unavailable` rather than a misleading verdict. `unavailable` also covers: nothing submitted, a submitted value not readable as a US five-digit code, and results cached before this field existed.",
                 "type": "string",
                 "enum": [
                   "match",
                   "conflict",
                   "unavailable"
-                ],
-                "description": "STRUCTURED GEOCODING ONLY (`geocode_structured` / `POST /v1/search/structured`); absent from free-text geocoding. Whether the postcode YOU SUBMITTED agrees with this candidate's own postcode — `match` (same five-digit value), `conflict` (they differ), `unavailable` (no comparison was possible). This compares two values already in hand: no lookup, no external reference, and your query text is never parsed to find one. `conflict` does NOT say which side is wrong — your input may name a neighbouring area, the candidate may be a near-miss, or the record's own value may be stale; treat it as a prompt to ask a human, never as a correction to apply automatically. The candidate side counts only when its postcode came from the address record itself; one inherited from a parent area yields `unavailable` rather than a misleading verdict. `unavailable` also covers: nothing submitted, a submitted value not readable as a US five-digit code, and results cached before this field existed."
+                ]
               },
               "address_line1": {
-                "type": "string",
-                "description": "House number and street for an eligible US address result, composed from the result's own components — never parsed from the display label. Absent when the result is not a US street address."
+                "description": "House number and street for an eligible US address result, composed from the result's own components — never parsed from the display label. Absent when the result is not a US street address.",
+                "type": "string"
               },
               "address_line2": {
-                "type": "string",
-                "description": "Unit or suite, only when the source record carries one. A unit supplied in your request is never echoed back here."
+                "description": "Unit or suite, only when the source record carries one. A unit supplied in your request is never echoed back here.",
+                "type": "string"
               },
               "formatted_address": {
-                "type": "string",
-                "description": "Single-line US display form, e.g. `1600 Pennsylvania Avenue NW, Washington, DC 20500, USA`. The postal segment is present only when an eligible ZIP is; its absence never suppresses the street address."
+                "description": "Single-line US display form, e.g. `1600 Pennsylvania Avenue NW, Washington, DC 20500, USA`. The postal segment is present only when an eligible ZIP is; its absence never suppresses the street address.",
+                "type": "string"
               },
               "address_components": {
+                "description": "The same US components the formatted string is built from. Every field is source-established or absent; nothing is inferred or back-filled.",
                 "type": "object",
                 "properties": {
                   "house_number": {
@@ -2015,8 +2195,7 @@
                     "type": "string"
                   }
                 },
-                "additionalProperties": false,
-                "description": "The same US components the formatted string is built from. Every field is source-established or absent; nothing is inferred or back-filled."
+                "additionalProperties": false
               },
               "method": {
                 "type": "string"
@@ -2028,7 +2207,7 @@
                 "type": "number"
               }
             },
-            "additionalProperties": true
+            "additionalProperties": {}
           }
         },
         "geojson": {
@@ -2086,7 +2265,7 @@
                         "required": [
                           "type"
                         ],
-                        "additionalProperties": true
+                        "additionalProperties": {}
                       },
                       {
                         "type": "null"
@@ -2095,6 +2274,9 @@
                   },
                   "properties": {
                     "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
                     "additionalProperties": {}
                   }
                 },
@@ -2102,7 +2284,7 @@
                   "type",
                   "geometry"
                 ],
-                "additionalProperties": true
+                "additionalProperties": {}
               }
             }
           },
@@ -2110,7 +2292,7 @@
             "type",
             "features"
           ],
-          "additionalProperties": true
+          "additionalProperties": {}
         },
         "display_hint": {
           "type": "object",
@@ -2154,7 +2336,7 @@
           "required": [
             "layout"
           ],
-          "additionalProperties": true
+          "additionalProperties": {}
         },
         "precision": {
           "type": "object",
@@ -2196,7 +2378,7 @@
               "required": [
                 "applied"
               ],
-              "additionalProperties": true
+              "additionalProperties": {}
             }
           },
           "required": [
@@ -2205,11 +2387,11 @@
             "required_context",
             "learning_overlay"
           ],
-          "additionalProperties": true
+          "additionalProperties": {}
         }
       },
-      "additionalProperties": true,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": {}
     },
     "annotations": {
       "title": "Structured Geocode",
@@ -2220,14 +2402,15 @@
   },
   {
     "name": "geofence_contains",
-    "description": "Tests one or more points for containment inside a polygon you supply as GeoJSON (Polygon, MultiPolygon, or a Feature/FeatureCollection wrapping one). Pure geometry against your own shape - it does not search a place index, so use explore or search_places to find what's near a point instead. Boundary points count as contained. Up to 1000 points per call, against a polygon of up to 100 rings/parts and 1000 positions per ring; larger inputs are rejected. Runs locally with no external lookup, but still counts as one metered request like other tools, so batch points into a single call rather than looping. Errors, rather than returning false, when the polygon is structurally invalid. Returns one boolean per point, in order, plus contained_count and point_count.",
+    "description": "Tests one or more points for containment inside a polygon you supply as GeoJSON (Polygon, MultiPolygon, or a Feature/FeatureCollection wrapping one). Pure geometry against your own shape - it does not search a place index, so use explore or search_places to find what's near a point instead. Boundary points count as contained. Up to 1000 points per call, against a polygon of up to 100 rings/parts and 1000 positions per ring; larger inputs are rejected. A polygon with more than about 1,500 positions in total must be sent as a GeoJSON string (the same GeoJSON, JSON-encoded) instead of as an object. Runs locally with no external lookup, but still counts as one metered request like other tools, so batch points into a single call rather than looping. Errors, rather than returning false, when the polygon is structurally invalid. Returns one boolean per point, in order, plus contained_count and point_count.",
     "inputSchema": {
       "type": "object",
       "properties": {
         "polygon": {
-          "description": "A GeoJSON Polygon / MultiPolygon geometry, a Feature wrapping one, or a FeatureCollection"
+          "description": "A GeoJSON Polygon / MultiPolygon geometry, a Feature wrapping one, or a FeatureCollection. Send it as a JSON-encoded string if it has more than about 1,500 positions"
         },
         "points": {
+          "maxItems": 1000,
           "type": "array",
           "items": {
             "type": "object",
@@ -2249,15 +2432,14 @@
             ],
             "additionalProperties": false
           },
-          "maxItems": 1000,
           "description": "Points to test ({ lat, lon } each), up to 1000"
         }
       },
       "required": [
         "points"
       ],
-      "additionalProperties": false,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": false
     },
     "outputSchema": {
       "type": "object",
@@ -2289,8 +2471,8 @@
         "contained_count",
         "point_count"
       ],
-      "additionalProperties": false,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": false
     },
     "annotations": {
       "title": "Geofence Contains",
@@ -2311,22 +2493,23 @@
           "description": "Center point address or 'lat,lon'"
         },
         "contours_minutes": {
+          "description": "Time bands in minutes, e.g. [10, 20, 30]. Max 4 bands per call (over returns 400).",
+          "maxItems": 4,
           "type": "array",
           "items": {
             "type": "number"
-          },
-          "maxItems": 4,
-          "description": "Time bands in minutes, e.g. [10, 20, 30]. Max 4 bands per call (over returns 400)."
+          }
         },
         "contours_km": {
+          "description": "Distance bands in km. Max 4 bands per call (over returns 400).",
+          "maxItems": 4,
           "type": "array",
           "items": {
             "type": "number"
-          },
-          "maxItems": 4,
-          "description": "Distance bands in km. Max 4 bands per call (over returns 400)."
+          }
         },
         "costing": {
+          "description": "Transport mode",
           "type": "string",
           "enum": [
             "auto",
@@ -2334,33 +2517,35 @@
             "bicycle",
             "pedestrian",
             "motorcycle"
-          ],
-          "description": "Transport mode"
+          ]
         },
         "truck_height": {
+          "description": "Truck height in meters",
           "type": "number",
           "minimum": 0,
-          "maximum": 30,
-          "description": "Truck height in meters"
+          "maximum": 30
         },
         "truck_weight": {
+          "description": "Truck weight in metric tons",
           "type": "number",
           "minimum": 0,
-          "maximum": 200,
-          "description": "Truck weight in metric tons"
+          "maximum": 200
         }
       },
       "required": [
         "location"
       ],
-      "additionalProperties": false,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": false
     },
     "outputSchema": {
       "type": "object",
       "properties": {
         "summary": {
           "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
           "additionalProperties": {},
           "description": "Map of scalar facts the LLM should surface verbatim"
         },
@@ -2369,6 +2554,9 @@
           "type": "array",
           "items": {
             "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
             "additionalProperties": {}
           }
         },
@@ -2427,7 +2615,7 @@
                         "required": [
                           "type"
                         ],
-                        "additionalProperties": true
+                        "additionalProperties": {}
                       },
                       {
                         "type": "null"
@@ -2436,6 +2624,9 @@
                   },
                   "properties": {
                     "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
                     "additionalProperties": {}
                   }
                 },
@@ -2443,7 +2634,7 @@
                   "type",
                   "geometry"
                 ],
-                "additionalProperties": true
+                "additionalProperties": {}
               }
             }
           },
@@ -2451,7 +2642,7 @@
             "type",
             "features"
           ],
-          "additionalProperties": true
+          "additionalProperties": {}
         },
         "display_hint": {
           "type": "object",
@@ -2495,11 +2686,11 @@
           "required": [
             "layout"
           ],
-          "additionalProperties": true
+          "additionalProperties": {}
         }
       },
-      "additionalProperties": true,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": {}
     },
     "annotations": {
       "title": "Isochrone (Reachability)",
@@ -2527,12 +2718,12 @@
           ]
         },
         "console_url": {
-          "type": "string",
-          "description": "Link to the signed-in ThinAir Geo console, where the owner creates an API key and sees it once in their own browser. This tool never returns a key."
+          "description": "Link to the signed-in ThinAir Geo console, where the owner creates an API key and sees it once in their own browser. This tool never returns a key.",
+          "type": "string"
         },
         "instructions": {
-          "type": "string",
-          "description": "How to create the key in the console and send it (Authorization: Bearer). Surface to the user as written."
+          "description": "How to create the key in the console and send it (Authorization: Bearer). Surface to the user as written.",
+          "type": "string"
         },
         "plan": {
           "type": "string"
@@ -2560,8 +2751,8 @@
       "required": [
         "status"
       ],
-      "additionalProperties": true,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": {}
     },
     "annotations": {
       "title": "Get ThinAir Geo API Key Link",
@@ -2578,46 +2769,46 @@
       "type": "object",
       "properties": {
         "lat": {
+          "description": "Latitude",
           "type": "number",
           "minimum": -90,
-          "maximum": 90,
-          "description": "Latitude"
+          "maximum": 90
         },
         "lon": {
+          "description": "Longitude",
           "type": "number",
           "minimum": -180,
-          "maximum": 180,
-          "description": "Longitude"
+          "maximum": 180
         },
         "costing": {
+          "description": "Travel profile scoping edge access/legality. Default 'auto'.",
           "type": "string",
           "enum": [
             "auto",
             "truck",
             "bicycle",
             "pedestrian"
-          ],
-          "description": "Travel profile scoping edge access/legality. Default 'auto'."
+          ]
         },
         "units": {
+          "description": "Unit system for the human summary — auto-detected (US/UK → imperial) when omitted.",
           "type": "string",
           "enum": [
             "imperial",
             "metric"
-          ],
-          "description": "Unit system for the human summary — auto-detected (US/UK → imperial) when omitted."
+          ]
         },
         "include_elevation": {
-          "type": "boolean",
-          "description": "Opt-in to point elevation — populates elevation_m/elevation_ft from terrain data (null with an 'elevation_unavailable' warning only where terrain isn't covered). grade_pct is a forward-compatible field that stays null for now (reserved for an elevation-enhanced road network)."
+          "description": "Opt-in to point elevation — populates elevation_m/elevation_ft from terrain data (null with an 'elevation_unavailable' warning only where terrain isn't covered). grade_pct is a forward-compatible field that stays null for now (reserved for an elevation-enhanced road network).",
+          "type": "boolean"
         }
       },
       "required": [
         "lat",
         "lon"
       ],
-      "additionalProperties": false,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": false
     },
     "outputSchema": {
       "type": "object",
@@ -2630,6 +2821,9 @@
           "type": "array",
           "items": {
             "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
             "additionalProperties": {}
           }
         },
@@ -2688,7 +2882,7 @@
                         "required": [
                           "type"
                         ],
-                        "additionalProperties": true
+                        "additionalProperties": {}
                       },
                       {
                         "type": "null"
@@ -2697,6 +2891,9 @@
                   },
                   "properties": {
                     "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
                     "additionalProperties": {}
                   }
                 },
@@ -2704,7 +2901,7 @@
                   "type",
                   "geometry"
                 ],
-                "additionalProperties": true
+                "additionalProperties": {}
               }
             }
           },
@@ -2712,7 +2909,7 @@
             "type",
             "features"
           ],
-          "additionalProperties": true
+          "additionalProperties": {}
         },
         "display_hint": {
           "type": "object",
@@ -2756,7 +2953,7 @@
           "required": [
             "layout"
           ],
-          "additionalProperties": true
+          "additionalProperties": {}
         },
         "matched": {
           "type": "boolean"
@@ -2788,12 +2985,15 @@
             "lat",
             "lon"
           ],
-          "additionalProperties": true
+          "additionalProperties": {}
         },
         "road": {
           "anyOf": [
             {
               "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
               "additionalProperties": {}
             },
             {
@@ -2802,11 +3002,11 @@
           ]
         },
         "timezone": {
+          "description": "IANA timezone for the point, or null unless timezone_status is resolved. Contains information from timezone-boundary-builder, which is made available under the Open Database License (ODbL) v1.0. Timezone boundaries © OpenStreetMap contributors. US legal-zone cross-check: U.S. Department of Transportation, Bureau of Transportation Statistics (public domain).",
           "type": [
             "string",
             "null"
-          ],
-          "description": "IANA timezone for the point, or null unless timezone_status is resolved. Contains information from timezone-boundary-builder, which is made available under the Open Database License (ODbL) v1.0. Timezone boundaries © OpenStreetMap contributors. US legal-zone cross-check: U.S. Department of Transportation, Bureau of Transportation Statistics (public domain)."
+          ]
         },
         "timezone_status": {
           "type": "string",
@@ -2852,15 +3052,15 @@
           "type": "object",
           "properties": {
             "degraded": {
-              "type": "boolean",
-              "description": "Present and true only when `road_status` is `unavailable`: the road part of the answer is missing; the rest is real."
+              "description": "Present and true only when `road_status` is `unavailable`: the road part of the answer is missing; the rest is real.",
+              "type": "boolean"
             }
           },
-          "additionalProperties": true
+          "additionalProperties": {}
         }
       },
-      "additionalProperties": true,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": {}
     },
     "annotations": {
       "title": "Locate",
@@ -2876,6 +3076,8 @@
       "type": "object",
       "properties": {
         "shape": {
+          "minItems": 2,
+          "maxItems": 100,
           "type": "array",
           "items": {
             "type": "object",
@@ -2901,43 +3103,41 @@
             ],
             "additionalProperties": false
           },
-          "minItems": 2,
-          "maxItems": 100,
           "description": "Raw GPS breadcrumb trail in travel order — 2 to 100 points of { lat, lon, time? }. `time` is optional epoch seconds; timestamps improve match quality on noisy traces."
         },
         "costing": {
+          "description": "Transport mode the trace was recorded with (default: auto)",
           "type": "string",
           "enum": [
             "auto",
             "truck",
             "bicycle",
             "pedestrian"
-          ],
-          "description": "Transport mode the trace was recorded with (default: auto)"
+          ]
         },
         "vehicle_profile": {
+          "description": "Truck preset (DRY_VAN_53, FLATBED_48, BOX_TRUCK_26, …) — same 10-profile table as directions. Implies costing=truck.",
           "type": "string",
-          "maxLength": 64,
-          "description": "Truck preset (DRY_VAN_53, FLATBED_48, BOX_TRUCK_26, …) — same 10-profile table as directions. Implies costing=truck."
+          "maxLength": 64
         },
         "search_radius": {
+          "description": "Snap radius in meters around each point (1–100). Increase for noisy GPS.",
           "type": "number",
           "minimum": 1,
-          "maximum": 100,
-          "description": "Snap radius in meters around each point (1–100). Increase for noisy GPS."
+          "maximum": 100
         },
         "breakage_distance_m": {
+          "description": "Maximum gap, in meters, between consecutive fixes before the trace is split into separate sections (100–20000). Increase for sparsely-reported GPS, such as fleet units reporting every several minutes on a highway. Optional — omitted uses the default.",
           "type": "integer",
           "minimum": 100,
-          "maximum": 20000,
-          "description": "Maximum gap, in meters, between consecutive fixes before the trace is split into separate sections (100–20000). Increase for sparsely-reported GPS, such as fleet units reporting every several minutes on a highway. Optional — omitted uses the default."
+          "maximum": 20000
         }
       },
       "required": [
         "shape"
       ],
-      "additionalProperties": false,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": false
     },
     "outputSchema": {
       "type": "object",
@@ -2989,7 +3189,7 @@
               "duration_seconds",
               "road_names"
             ],
-            "additionalProperties": true
+            "additionalProperties": {}
           }
         },
         "costing": {
@@ -3000,6 +3200,9 @@
         },
         "costing_options": {
           "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
           "additionalProperties": {}
         },
         "geojson": {
@@ -3057,7 +3260,7 @@
                         "required": [
                           "type"
                         ],
-                        "additionalProperties": true
+                        "additionalProperties": {}
                       },
                       {
                         "type": "null"
@@ -3066,6 +3269,9 @@
                   },
                   "properties": {
                     "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
                     "additionalProperties": {}
                   }
                 },
@@ -3073,7 +3279,7 @@
                   "type",
                   "geometry"
                 ],
-                "additionalProperties": true
+                "additionalProperties": {}
               }
             }
           },
@@ -3081,10 +3287,13 @@
             "type",
             "features"
           ],
-          "additionalProperties": true
+          "additionalProperties": {}
         },
         "geometry": {
           "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
           "additionalProperties": {}
         },
         "meta": {
@@ -3097,15 +3306,15 @@
               "type": "integer"
             },
             "breakage_distance_m": {
-              "type": "integer",
-              "description": "Echoes the breakage_distance_m the caller requested, for confirmation — present only when the caller set it. This is the value SENT to the matcher, not a claim about what it did with it."
+              "description": "Echoes the breakage_distance_m the caller requested, for confirmation — present only when the caller set it. This is the value SENT to the matcher, not a claim about what it did with it.",
+              "type": "integer"
             }
           },
           "required": [
             "upstream_ms",
             "point_count"
           ],
-          "additionalProperties": true
+          "additionalProperties": {}
         },
         "match_status": {
           "anyOf": [
@@ -3131,44 +3340,32 @@
               "description": "Number of input GPS points"
             },
             "matched_count": {
-              "anyOf": [
-                {
-                  "type": "integer"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "Input points the matcher placed on the road network directly. null when unavailable."
+              "description": "Input points the matcher placed on the road network directly. null when unavailable.",
+              "type": [
+                "integer",
+                "null"
+              ]
             },
             "interpolated_count": {
-              "anyOf": [
-                {
-                  "type": "integer"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "Input points the matcher placed on the road network by interpolating between matched neighbours; counted as covered. null when unavailable."
+              "description": "Input points the matcher placed on the road network by interpolating between matched neighbours; counted as covered. null when unavailable.",
+              "type": [
+                "integer",
+                "null"
+              ]
             },
             "unmatched_count": {
-              "anyOf": [
-                {
-                  "type": "integer"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "Input points the matcher could not place on the road network. null when unavailable."
+              "description": "Input points the matcher could not place on the road network. null when unavailable.",
+              "type": [
+                "integer",
+                "null"
+              ]
             },
             "ratio": {
+              "description": "0–1: (matched_count + interpolated_count) / point_count, rounded down to 3 decimals so a partial trace never reads 1. null when unavailable.",
               "type": [
                 "number",
                 "null"
-              ],
-              "description": "0–1: (matched_count + interpolated_count) / point_count, rounded down to 3 decimals so a partial trace never reads 1. null when unavailable."
+              ]
             },
             "unmatched_ranges": {
               "anyOf": [
@@ -3195,7 +3392,7 @@
                       "end_index",
                       "point_count"
                     ],
-                    "additionalProperties": true
+                    "additionalProperties": {}
                   }
                 },
                 {
@@ -3237,7 +3434,7 @@
             "route_sections",
             "unavailable_reason"
           ],
-          "additionalProperties": true,
+          "additionalProperties": {},
           "description": "Per-point coverage of the trace from the matcher's own per-point status — independent of the distance-based `confidence`. Every key is always present."
         }
       },
@@ -3250,8 +3447,8 @@
         "legs",
         "costing"
       ],
-      "additionalProperties": true,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": {}
     },
     "annotations": {
       "title": "Map Match (GPS → road)",
@@ -3276,8 +3473,8 @@
       "required": [
         "id"
       ],
-      "additionalProperties": false,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": false
     },
     "outputSchema": {
       "type": "object",
@@ -3316,10 +3513,16 @@
         },
         "components": {
           "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
           "additionalProperties": {}
         },
         "meta": {
           "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
           "additionalProperties": {}
         }
       },
@@ -3329,8 +3532,8 @@
         "lat",
         "lon"
       ],
-      "additionalProperties": true,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": {}
     },
     "annotations": {
       "title": "Get Place by ID",
@@ -3419,18 +3622,21 @@
             "monthly_limit",
             "price_per_month"
           ],
-          "additionalProperties": true
+          "additionalProperties": {}
         },
         "upstream": {
           "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
           "additionalProperties": {}
         }
       },
       "required": [
         "mcp"
       ],
-      "additionalProperties": true,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": {}
     },
     "annotations": {
       "title": "Check Quota",
@@ -3458,28 +3664,28 @@
           "description": "Second (cross) street of the pair"
         },
         "locality": {
+          "description": "City / town that scopes the lookup",
           "type": "string",
-          "maxLength": 2000,
-          "description": "City / town that scopes the lookup"
+          "maxLength": 2000
         },
         "region": {
+          "description": "State / province (full name or abbreviation, e.g. 'TX')",
           "type": "string",
-          "maxLength": 2000,
-          "description": "State / province (full name or abbreviation, e.g. 'TX')"
+          "maxLength": 2000
         },
         "country": {
+          "description": "ISO 3166-1 alpha-2/alpha-3 country code",
           "type": "string",
           "minLength": 2,
-          "maxLength": 3,
-          "description": "ISO 3166-1 alpha-2/alpha-3 country code"
+          "maxLength": 3
         }
       },
       "required": [
         "street1",
         "street2"
       ],
-      "additionalProperties": false,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": false
     },
     "outputSchema": {
       "type": "object",
@@ -3548,11 +3754,12 @@
                   "type": "string"
                 },
                 "confidence_scope": {
+                  "description": "What `confidence` is scoped to. `query_to_candidate` means it scores how well this candidate matches the submitted query — it is NOT a probability that the place is real, that the address is correct, or that mail would arrive. Fixed value today; treat it as a closed set that may gain members.",
                   "type": "string",
-                  "const": "query_to_candidate",
-                  "description": "What `confidence` is scoped to. `query_to_candidate` means it scores how well this candidate matches the submitted query — it is NOT a probability that the place is real, that the address is correct, or that mail would arrive. Fixed value today; treat it as a closed set that may gain members."
+                  "const": "query_to_candidate"
                 },
                 "address_evidence": {
+                  "description": "What THIS CANDIDATE carries, component by component — `matched` (a real value is present), `partial` (only a coarser or derived stand-in, e.g. an interpolated house number or a locality falling back to its administrative parent), `absent` (nothing). This describes the result, NOT a comparison against your query: the engine returns no per-component match data, and re-parsing your text here would mean two parsers disagreeing about the same string. Derived from the feature, never from `confidence`.",
                   "type": "object",
                   "properties": {
                     "house_number": {
@@ -3564,13 +3771,28 @@
                       ]
                     },
                     "street": {
-                      "$ref": "#/properties/feature/anyOf/0/properties/address_evidence/properties/house_number"
+                      "type": "string",
+                      "enum": [
+                        "matched",
+                        "partial",
+                        "absent"
+                      ]
                     },
                     "locality": {
-                      "$ref": "#/properties/feature/anyOf/0/properties/address_evidence/properties/house_number"
+                      "type": "string",
+                      "enum": [
+                        "matched",
+                        "partial",
+                        "absent"
+                      ]
                     },
                     "region": {
-                      "$ref": "#/properties/feature/anyOf/0/properties/address_evidence/properties/house_number"
+                      "type": "string",
+                      "enum": [
+                        "matched",
+                        "partial",
+                        "absent"
+                      ]
                     },
                     "postal_code": {
                       "type": "string",
@@ -3589,36 +3811,36 @@
                     "region",
                     "postal_code"
                   ],
-                  "additionalProperties": false,
-                  "description": "What THIS CANDIDATE carries, component by component — `matched` (a real value is present), `partial` (only a coarser or derived stand-in, e.g. an interpolated house number or a locality falling back to its administrative parent), `absent` (nothing). This describes the result, NOT a comparison against your query: the engine returns no per-component match data, and re-parsing your text here would mean two parsers disagreeing about the same string. Derived from the feature, never from `confidence`."
+                  "additionalProperties": false
                 },
                 "postal_code": {
+                  "description": "An eligible US ZIP5 read from the selected result's own postal-code field. While origin enforcement is active this field is emitted ONLY when the engine stamped the value as coming from the address record itself (`source_record` provenance); a value inherited from a parent area, or a result cached before that evidence existed, is omitted rather than emitted without provenance — so an absent ZIP under enforcement means \"not proven for this record\", not \"no such ZIP\". Provenance describes only WHERE the value came from. It is not a postal operator check of any kind — no certification, no address-quality rating, and no statement about whether mail would arrive — so a syntactically correct, correctly-sourced value can still be wrong for the address. Also omitted when unavailable or unsuitable for five-digit form. US address results only. Distinct from `address_evidence.postal_code`, which is a presence STATUS rather than a value. On reverse geocoding this describes the RETURNED ADDRESS — it is not a postal assignment to the coordinate you supplied.",
                   "type": "string",
-                  "pattern": "^[0-9]{5}$",
-                  "description": "An eligible US ZIP5 read from the selected result's own postal-code field. While origin enforcement is active this field is emitted ONLY when the engine stamped the value as coming from the address record itself (`source_record` provenance); a value inherited from a parent area, or a result cached before that evidence existed, is omitted rather than emitted without provenance — so an absent ZIP under enforcement means \"not proven for this record\", not \"no such ZIP\". Provenance describes only WHERE the value came from. It is not a postal operator check of any kind — no certification, no address-quality rating, and no statement about whether mail would arrive — so a syntactically correct, correctly-sourced value can still be wrong for the address. Also omitted when unavailable or unsuitable for five-digit form. US address results only. Distinct from `address_evidence.postal_code`, which is a presence STATUS rather than a value. On reverse geocoding this describes the RETURNED ADDRESS — it is not a postal assignment to the coordinate you supplied."
+                  "pattern": "^[0-9]{5}$"
                 },
                 "postal_input_match": {
+                  "description": "STRUCTURED GEOCODING ONLY (`geocode_structured` / `POST /v1/search/structured`); absent from free-text geocoding. Whether the postcode YOU SUBMITTED agrees with this candidate's own postcode — `match` (same five-digit value), `conflict` (they differ), `unavailable` (no comparison was possible). This compares two values already in hand: no lookup, no external reference, and your query text is never parsed to find one. `conflict` does NOT say which side is wrong — your input may name a neighbouring area, the candidate may be a near-miss, or the record's own value may be stale; treat it as a prompt to ask a human, never as a correction to apply automatically. The candidate side counts only when its postcode came from the address record itself; one inherited from a parent area yields `unavailable` rather than a misleading verdict. `unavailable` also covers: nothing submitted, a submitted value not readable as a US five-digit code, and results cached before this field existed.",
                   "type": "string",
                   "enum": [
                     "match",
                     "conflict",
                     "unavailable"
-                  ],
-                  "description": "STRUCTURED GEOCODING ONLY (`geocode_structured` / `POST /v1/search/structured`); absent from free-text geocoding. Whether the postcode YOU SUBMITTED agrees with this candidate's own postcode — `match` (same five-digit value), `conflict` (they differ), `unavailable` (no comparison was possible). This compares two values already in hand: no lookup, no external reference, and your query text is never parsed to find one. `conflict` does NOT say which side is wrong — your input may name a neighbouring area, the candidate may be a near-miss, or the record's own value may be stale; treat it as a prompt to ask a human, never as a correction to apply automatically. The candidate side counts only when its postcode came from the address record itself; one inherited from a parent area yields `unavailable` rather than a misleading verdict. `unavailable` also covers: nothing submitted, a submitted value not readable as a US five-digit code, and results cached before this field existed."
+                  ]
                 },
                 "address_line1": {
-                  "type": "string",
-                  "description": "House number and street for an eligible US address result, composed from the result's own components — never parsed from the display label. Absent when the result is not a US street address."
+                  "description": "House number and street for an eligible US address result, composed from the result's own components — never parsed from the display label. Absent when the result is not a US street address.",
+                  "type": "string"
                 },
                 "address_line2": {
-                  "type": "string",
-                  "description": "Unit or suite, only when the source record carries one. A unit supplied in your request is never echoed back here."
+                  "description": "Unit or suite, only when the source record carries one. A unit supplied in your request is never echoed back here.",
+                  "type": "string"
                 },
                 "formatted_address": {
-                  "type": "string",
-                  "description": "Single-line US display form, e.g. `1600 Pennsylvania Avenue NW, Washington, DC 20500, USA`. The postal segment is present only when an eligible ZIP is; its absence never suppresses the street address."
+                  "description": "Single-line US display form, e.g. `1600 Pennsylvania Avenue NW, Washington, DC 20500, USA`. The postal segment is present only when an eligible ZIP is; its absence never suppresses the street address.",
+                  "type": "string"
                 },
                 "address_components": {
+                  "description": "The same US components the formatted string is built from. Every field is source-established or absent; nothing is inferred or back-filled.",
                   "type": "object",
                   "properties": {
                     "house_number": {
@@ -3646,8 +3868,7 @@
                       "type": "string"
                     }
                   },
-                  "additionalProperties": false,
-                  "description": "The same US components the formatted string is built from. Every field is source-established or absent; nothing is inferred or back-filled."
+                  "additionalProperties": false
                 },
                 "method": {
                   "type": "string"
@@ -3659,7 +3880,7 @@
                   "type": "number"
                 }
               },
-              "additionalProperties": true
+              "additionalProperties": {}
             },
             {
               "type": "null"
@@ -3672,8 +3893,8 @@
           "description": "Resolved confidence 0–1 (0 when nothing resolved)"
         },
         "fallback_used": {
-          "type": "boolean",
-          "description": "True when the geocoder fallback produced the answer"
+          "description": "True when the geocoder fallback produced the answer",
+          "type": "boolean"
         },
         "admin": {
           "type": "object",
@@ -3688,7 +3909,7 @@
               "type": "string"
             }
           },
-          "additionalProperties": true
+          "additionalProperties": {}
         },
         "meta": {
           "type": "object",
@@ -3703,7 +3924,7 @@
               "type": "string"
             }
           },
-          "additionalProperties": true
+          "additionalProperties": {}
         },
         "warnings": {
           "type": "array",
@@ -3757,7 +3978,7 @@
               "required": [
                 "applied"
               ],
-              "additionalProperties": true
+              "additionalProperties": {}
             }
           },
           "required": [
@@ -3766,15 +3987,15 @@
             "required_context",
             "learning_overlay"
           ],
-          "additionalProperties": true
+          "additionalProperties": {}
         }
       },
       "required": [
         "feature",
         "confidence"
       ],
-      "additionalProperties": true,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": {}
     },
     "annotations": {
       "title": "Resolve Intersection",
@@ -3790,41 +4011,44 @@
       "type": "object",
       "properties": {
         "lat": {
+          "description": "Latitude",
           "type": "number",
           "minimum": -90,
-          "maximum": 90,
-          "description": "Latitude"
+          "maximum": 90
         },
         "lon": {
+          "description": "Longitude",
           "type": "number",
           "minimum": -180,
-          "maximum": 180,
-          "description": "Longitude"
+          "maximum": 180
         },
         "size": {
+          "description": "Number of nearby candidates (default 5, max 40)",
           "type": "number",
           "minimum": 1,
-          "maximum": 40,
-          "description": "Number of nearby candidates (default 5, max 40)"
+          "maximum": 40
         },
         "layers": {
+          "description": "Restrict to a comma list of: address, street, venue, neighbourhood, borough, locality, localadmin, county, macrocounty, region, macroregion, dependency, country, continent, postalcode, coarse. Admin layers resolve from the nearest indexed feature's parent hierarchy.",
           "type": "string",
-          "maxLength": 200,
-          "description": "Restrict to a comma list of: address, street, venue, neighbourhood, borough, locality, localadmin, county, macrocounty, region, macroregion, dependency, country, continent, postalcode, coarse. Admin layers resolve from the nearest indexed feature's parent hierarchy."
+          "maxLength": 200
         }
       },
       "required": [
         "lat",
         "lon"
       ],
-      "additionalProperties": false,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": false
     },
     "outputSchema": {
       "type": "object",
       "properties": {
         "summary": {
           "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
           "additionalProperties": {},
           "description": "Map of scalar facts the LLM should surface verbatim"
         },
@@ -3893,11 +4117,12 @@
                 "type": "string"
               },
               "confidence_scope": {
+                "description": "What `confidence` is scoped to. `query_to_candidate` means it scores how well this candidate matches the submitted query — it is NOT a probability that the place is real, that the address is correct, or that mail would arrive. Fixed value today; treat it as a closed set that may gain members.",
                 "type": "string",
-                "const": "query_to_candidate",
-                "description": "What `confidence` is scoped to. `query_to_candidate` means it scores how well this candidate matches the submitted query — it is NOT a probability that the place is real, that the address is correct, or that mail would arrive. Fixed value today; treat it as a closed set that may gain members."
+                "const": "query_to_candidate"
               },
               "address_evidence": {
+                "description": "What THIS CANDIDATE carries, component by component — `matched` (a real value is present), `partial` (only a coarser or derived stand-in, e.g. an interpolated house number or a locality falling back to its administrative parent), `absent` (nothing). This describes the result, NOT a comparison against your query: the engine returns no per-component match data, and re-parsing your text here would mean two parsers disagreeing about the same string. Derived from the feature, never from `confidence`.",
                 "type": "object",
                 "properties": {
                   "house_number": {
@@ -3909,13 +4134,28 @@
                     ]
                   },
                   "street": {
-                    "$ref": "#/properties/items/items/properties/address_evidence/properties/house_number"
+                    "type": "string",
+                    "enum": [
+                      "matched",
+                      "partial",
+                      "absent"
+                    ]
                   },
                   "locality": {
-                    "$ref": "#/properties/items/items/properties/address_evidence/properties/house_number"
+                    "type": "string",
+                    "enum": [
+                      "matched",
+                      "partial",
+                      "absent"
+                    ]
                   },
                   "region": {
-                    "$ref": "#/properties/items/items/properties/address_evidence/properties/house_number"
+                    "type": "string",
+                    "enum": [
+                      "matched",
+                      "partial",
+                      "absent"
+                    ]
                   },
                   "postal_code": {
                     "type": "string",
@@ -3934,36 +4174,36 @@
                   "region",
                   "postal_code"
                 ],
-                "additionalProperties": false,
-                "description": "What THIS CANDIDATE carries, component by component — `matched` (a real value is present), `partial` (only a coarser or derived stand-in, e.g. an interpolated house number or a locality falling back to its administrative parent), `absent` (nothing). This describes the result, NOT a comparison against your query: the engine returns no per-component match data, and re-parsing your text here would mean two parsers disagreeing about the same string. Derived from the feature, never from `confidence`."
+                "additionalProperties": false
               },
               "postal_code": {
+                "description": "An eligible US ZIP5 read from the selected result's own postal-code field. While origin enforcement is active this field is emitted ONLY when the engine stamped the value as coming from the address record itself (`source_record` provenance); a value inherited from a parent area, or a result cached before that evidence existed, is omitted rather than emitted without provenance — so an absent ZIP under enforcement means \"not proven for this record\", not \"no such ZIP\". Provenance describes only WHERE the value came from. It is not a postal operator check of any kind — no certification, no address-quality rating, and no statement about whether mail would arrive — so a syntactically correct, correctly-sourced value can still be wrong for the address. Also omitted when unavailable or unsuitable for five-digit form. US address results only. Distinct from `address_evidence.postal_code`, which is a presence STATUS rather than a value. On reverse geocoding this describes the RETURNED ADDRESS — it is not a postal assignment to the coordinate you supplied.",
                 "type": "string",
-                "pattern": "^[0-9]{5}$",
-                "description": "An eligible US ZIP5 read from the selected result's own postal-code field. While origin enforcement is active this field is emitted ONLY when the engine stamped the value as coming from the address record itself (`source_record` provenance); a value inherited from a parent area, or a result cached before that evidence existed, is omitted rather than emitted without provenance — so an absent ZIP under enforcement means \"not proven for this record\", not \"no such ZIP\". Provenance describes only WHERE the value came from. It is not a postal operator check of any kind — no certification, no address-quality rating, and no statement about whether mail would arrive — so a syntactically correct, correctly-sourced value can still be wrong for the address. Also omitted when unavailable or unsuitable for five-digit form. US address results only. Distinct from `address_evidence.postal_code`, which is a presence STATUS rather than a value. On reverse geocoding this describes the RETURNED ADDRESS — it is not a postal assignment to the coordinate you supplied."
+                "pattern": "^[0-9]{5}$"
               },
               "postal_input_match": {
+                "description": "STRUCTURED GEOCODING ONLY (`geocode_structured` / `POST /v1/search/structured`); absent from free-text geocoding. Whether the postcode YOU SUBMITTED agrees with this candidate's own postcode — `match` (same five-digit value), `conflict` (they differ), `unavailable` (no comparison was possible). This compares two values already in hand: no lookup, no external reference, and your query text is never parsed to find one. `conflict` does NOT say which side is wrong — your input may name a neighbouring area, the candidate may be a near-miss, or the record's own value may be stale; treat it as a prompt to ask a human, never as a correction to apply automatically. The candidate side counts only when its postcode came from the address record itself; one inherited from a parent area yields `unavailable` rather than a misleading verdict. `unavailable` also covers: nothing submitted, a submitted value not readable as a US five-digit code, and results cached before this field existed.",
                 "type": "string",
                 "enum": [
                   "match",
                   "conflict",
                   "unavailable"
-                ],
-                "description": "STRUCTURED GEOCODING ONLY (`geocode_structured` / `POST /v1/search/structured`); absent from free-text geocoding. Whether the postcode YOU SUBMITTED agrees with this candidate's own postcode — `match` (same five-digit value), `conflict` (they differ), `unavailable` (no comparison was possible). This compares two values already in hand: no lookup, no external reference, and your query text is never parsed to find one. `conflict` does NOT say which side is wrong — your input may name a neighbouring area, the candidate may be a near-miss, or the record's own value may be stale; treat it as a prompt to ask a human, never as a correction to apply automatically. The candidate side counts only when its postcode came from the address record itself; one inherited from a parent area yields `unavailable` rather than a misleading verdict. `unavailable` also covers: nothing submitted, a submitted value not readable as a US five-digit code, and results cached before this field existed."
+                ]
               },
               "address_line1": {
-                "type": "string",
-                "description": "House number and street for an eligible US address result, composed from the result's own components — never parsed from the display label. Absent when the result is not a US street address."
+                "description": "House number and street for an eligible US address result, composed from the result's own components — never parsed from the display label. Absent when the result is not a US street address.",
+                "type": "string"
               },
               "address_line2": {
-                "type": "string",
-                "description": "Unit or suite, only when the source record carries one. A unit supplied in your request is never echoed back here."
+                "description": "Unit or suite, only when the source record carries one. A unit supplied in your request is never echoed back here.",
+                "type": "string"
               },
               "formatted_address": {
-                "type": "string",
-                "description": "Single-line US display form, e.g. `1600 Pennsylvania Avenue NW, Washington, DC 20500, USA`. The postal segment is present only when an eligible ZIP is; its absence never suppresses the street address."
+                "description": "Single-line US display form, e.g. `1600 Pennsylvania Avenue NW, Washington, DC 20500, USA`. The postal segment is present only when an eligible ZIP is; its absence never suppresses the street address.",
+                "type": "string"
               },
               "address_components": {
+                "description": "The same US components the formatted string is built from. Every field is source-established or absent; nothing is inferred or back-filled.",
                 "type": "object",
                 "properties": {
                   "house_number": {
@@ -3991,8 +4231,7 @@
                     "type": "string"
                   }
                 },
-                "additionalProperties": false,
-                "description": "The same US components the formatted string is built from. Every field is source-established or absent; nothing is inferred or back-filled."
+                "additionalProperties": false
               },
               "method": {
                 "type": "string"
@@ -4004,7 +4243,7 @@
                 "type": "number"
               }
             },
-            "additionalProperties": true
+            "additionalProperties": {}
           }
         },
         "geojson": {
@@ -4062,7 +4301,7 @@
                         "required": [
                           "type"
                         ],
-                        "additionalProperties": true
+                        "additionalProperties": {}
                       },
                       {
                         "type": "null"
@@ -4071,6 +4310,9 @@
                   },
                   "properties": {
                     "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
                     "additionalProperties": {}
                   }
                 },
@@ -4078,7 +4320,7 @@
                   "type",
                   "geometry"
                 ],
-                "additionalProperties": true
+                "additionalProperties": {}
               }
             }
           },
@@ -4086,7 +4328,7 @@
             "type",
             "features"
           ],
-          "additionalProperties": true
+          "additionalProperties": {}
         },
         "display_hint": {
           "type": "object",
@@ -4130,7 +4372,7 @@
           "required": [
             "layout"
           ],
-          "additionalProperties": true
+          "additionalProperties": {}
         },
         "precision": {
           "type": "object",
@@ -4172,7 +4414,7 @@
               "required": [
                 "applied"
               ],
-              "additionalProperties": true
+              "additionalProperties": {}
             }
           },
           "required": [
@@ -4181,11 +4423,11 @@
             "required_context",
             "learning_overlay"
           ],
-          "additionalProperties": true
+          "additionalProperties": {}
         }
       },
-      "additionalProperties": true,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": {}
     },
     "annotations": {
       "title": "Reverse Geocode",
@@ -4201,49 +4443,56 @@
       "type": "object",
       "properties": {
         "query": {
+          "description": "Free-text place query such as 'truck stop', 'restaurant', 'charging station'. One of `query` or `categories` is required — a bare center (`lat`+`lon`/`center`) with neither is rejected.",
           "type": "string",
-          "maxLength": 2000,
-          "description": "Free-text place query such as 'truck stop', 'restaurant', 'charging station'. One of `query` or `categories` is required — a bare center (`lat`+`lon`/`center`) with neither is rejected."
+          "maxLength": 2000
         },
         "categories": {
+          "description": "Structured categories: food, fuel, charging_station, education, health, entertainment, retail, accommodation, nightlife, transport, government, recreation. One of `categories` or `query` is required — a bare center (`lat`+`lon`/`center`) with neither is rejected.",
+          "maxItems": 20,
           "type": "array",
           "items": {
             "type": "string",
             "maxLength": 2000
-          },
-          "maxItems": 20,
-          "description": "Structured categories: food, fuel, charging_station, education, health, entertainment, retail, accommodation, nightlife, transport, government, recreation. One of `categories` or `query` is required — a bare center (`lat`+`lon`/`center`) with neither is rejected."
+          }
         },
         "lat": {
+          "description": "Center latitude (alternative to `center` object)",
           "type": "number",
           "minimum": -90,
-          "maximum": 90,
-          "description": "Center latitude (alternative to `center` object)"
+          "maximum": 90
         },
         "lon": {
+          "description": "Center longitude (alternative to `center` object)",
           "type": "number",
           "minimum": -180,
-          "maximum": 180,
-          "description": "Center longitude (alternative to `center` object)"
+          "maximum": 180
         },
         "center": {
+          "description": "Center point for nearby search ({lat, lon} object or JSON string). You can also pass flat lat/lon.",
           "type": "object",
           "properties": {
             "lat": {
-              "$ref": "#/properties/lat"
+              "description": "Latitude of the center point",
+              "type": "number",
+              "minimum": -90,
+              "maximum": 90
             },
             "lon": {
-              "$ref": "#/properties/lon"
+              "description": "Longitude of the center point",
+              "type": "number",
+              "minimum": -180,
+              "maximum": 180
             }
           },
           "required": [
             "lat",
             "lon"
           ],
-          "additionalProperties": false,
-          "description": "Center point for nearby search ({lat, lon} object or JSON string). You can also pass flat lat/lon."
+          "additionalProperties": false
         },
         "radius": {
+          "description": "Search radius — e.g. radius: 30, units: 'miles'. Bare numbers are miles unless units is set; kilometers via units or a km suffix ('5km'); aliases mi/km/imperial/metric. A value carrying its own unit suffix ('30mi', '5km') is also accepted and its suffix wins. Default 50 km (about 31 mi); maximum 50 km (up to 31.068 mi). Preferred over `radius_m`. Numeric values above 50 fail input validation before the tool runs; a string form over the maximum ('60km') or an in-range number that is over the cap once read as miles (e.g. 40, or 40 with units 'miles' — 64 km) is rejected with a radius error instead of results.",
           "anyOf": [
             {
               "type": "number",
@@ -4254,43 +4503,45 @@
               "type": "string",
               "maxLength": 32
             }
-          ],
-          "description": "Search radius — e.g. radius: 30, units: 'miles'. Bare numbers are miles unless units is set; kilometers via units or a km suffix ('5km'); aliases mi/km/imperial/metric. A value carrying its own unit suffix ('30mi', '5km') is also accepted and its suffix wins. Default 50 km (about 31 mi); maximum 50 km (up to 31.068 mi). Preferred over `radius_m`. Numeric values above 50 fail input validation before the tool runs; a string form over the maximum ('60km') or an in-range number that is over the cap once read as miles (e.g. 40, or 40 with units 'miles' — 64 km) is rejected with a radius error instead of results."
+          ]
         },
         "units": {
+          "description": "Units for a bare numeric `radius`: miles (default) or kilometers. Accepts the aliases mi, mile, imperial (miles) and km, kilometer, kilometre, kilometres, metric (kilometers), any case; echoed as miles|kilometers. Ignored when `radius` already carries a unit suffix; a contradicting pair is rejected. Not valid with `radius_m` alone — radius_m is always meters, so that pair is rejected. Does not supply a radius on its own (the default 50 km applies) but selects the display unit of the `units` echo.",
           "type": "string",
           "enum": [
             "miles",
             "kilometers"
-          ],
-          "description": "Units for a bare numeric `radius`: miles (default) or kilometers. Accepts the aliases mi, mile, imperial (miles) and km, kilometer, kilometre, kilometres, metric (kilometers), any case; echoed as miles|kilometers. Ignored when `radius` already carries a unit suffix; a contradicting pair is rejected. Not valid with `radius_m` alone — radius_m is always meters, so that pair is rejected. Does not supply a radius on its own (the default 50 km applies) but selects the display unit of the `units` echo."
+          ]
         },
         "radius_m": {
+          "description": "Search radius in meters (max 50000 — i.e. 50 km / ~31 mi; default 50 km; 0 means 'not supplied' and applies the default). Accepted alias; `radius` + `units` is preferred. Sending both is only valid when they agree. Do not pair with `units`.",
           "type": "number",
           "minimum": 0,
-          "maximum": 50000,
-          "description": "Search radius in meters (max 50000 — i.e. 50 km / ~31 mi; default 50 km; 0 means 'not supplied' and applies the default). Accepted alias; `radius` + `units` is preferred. Sending both is only valid when they agree. Do not pair with `units`."
+          "maximum": 50000
         },
         "limit": {
+          "description": "Max results (default 10, max 50)",
           "type": "number",
           "minimum": 1,
-          "maximum": 50,
-          "description": "Max results (default 10, max 50)"
+          "maximum": 50
         },
         "layers": {
+          "description": "Restrict to: venue, address",
           "type": "string",
-          "maxLength": 200,
-          "description": "Restrict to: venue, address"
+          "maxLength": 200
         }
       },
-      "additionalProperties": false,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": false
     },
     "outputSchema": {
       "type": "object",
       "properties": {
         "summary": {
           "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
           "additionalProperties": {},
           "description": "Map of scalar facts the LLM should surface verbatim"
         },
@@ -4325,7 +4576,7 @@
                 "type": "number"
               }
             },
-            "additionalProperties": true
+            "additionalProperties": {}
           }
         },
         "geojson": {
@@ -4383,7 +4634,7 @@
                         "required": [
                           "type"
                         ],
-                        "additionalProperties": true
+                        "additionalProperties": {}
                       },
                       {
                         "type": "null"
@@ -4392,6 +4643,9 @@
                   },
                   "properties": {
                     "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
                     "additionalProperties": {}
                   }
                 },
@@ -4399,7 +4653,7 @@
                   "type",
                   "geometry"
                 ],
-                "additionalProperties": true
+                "additionalProperties": {}
               }
             }
           },
@@ -4407,7 +4661,7 @@
             "type",
             "features"
           ],
-          "additionalProperties": true
+          "additionalProperties": {}
         },
         "display_hint": {
           "type": "object",
@@ -4451,7 +4705,7 @@
           "required": [
             "layout"
           ],
-          "additionalProperties": true
+          "additionalProperties": {}
         },
         "meta": {
           "type": "object",
@@ -4471,11 +4725,11 @@
             "radius_km",
             "units"
           ],
-          "additionalProperties": true
+          "additionalProperties": {}
         }
       },
-      "additionalProperties": true,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": {}
     },
     "annotations": {
       "title": "Search Places",
@@ -4491,6 +4745,8 @@
       "type": "object",
       "properties": {
         "shape": {
+          "minItems": 2,
+          "maxItems": 100,
           "type": "array",
           "items": {
             "type": "object",
@@ -4516,43 +4772,41 @@
             ],
             "additionalProperties": false
           },
-          "minItems": 2,
-          "maxItems": 100,
           "description": "Raw GPS breadcrumb trail in travel order — 2 to 100 points of { lat, lon, time? }. `time` is optional epoch seconds; timestamps improve match quality on noisy traces."
         },
         "costing": {
+          "description": "Transport mode the trace was recorded with (default: auto)",
           "type": "string",
           "enum": [
             "auto",
             "truck",
             "bicycle",
             "pedestrian"
-          ],
-          "description": "Transport mode the trace was recorded with (default: auto)"
+          ]
         },
         "vehicle_profile": {
+          "description": "Truck preset (DRY_VAN_53, FLATBED_48, BOX_TRUCK_26, …) — same 10-profile table as directions. Implies costing=truck.",
           "type": "string",
-          "maxLength": 64,
-          "description": "Truck preset (DRY_VAN_53, FLATBED_48, BOX_TRUCK_26, …) — same 10-profile table as directions. Implies costing=truck."
+          "maxLength": 64
         },
         "search_radius": {
+          "description": "Snap radius in meters around each point (1–100). Increase for noisy GPS.",
           "type": "number",
           "minimum": 1,
-          "maximum": 100,
-          "description": "Snap radius in meters around each point (1–100). Increase for noisy GPS."
+          "maximum": 100
         },
         "breakage_distance_m": {
+          "description": "Maximum gap, in meters, between consecutive fixes before the trace is split into separate sections (100–20000). Increase for sparsely-reported GPS, such as fleet units reporting every several minutes on a highway. Optional — omitted uses the default.",
           "type": "integer",
           "minimum": 100,
-          "maximum": 20000,
-          "description": "Maximum gap, in meters, between consecutive fixes before the trace is split into separate sections (100–20000). Increase for sparsely-reported GPS, such as fleet units reporting every several minutes on a highway. Optional — omitted uses the default."
+          "maximum": 20000
         }
       },
       "required": [
         "shape"
       ],
-      "additionalProperties": false,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": false
     },
     "outputSchema": {
       "type": "object",
@@ -4630,7 +4884,7 @@
             "required": [
               "length_m"
             ],
-            "additionalProperties": true
+            "additionalProperties": {}
           }
         },
         "road_names": {
@@ -4643,6 +4897,9 @@
           "type": "array",
           "items": {
             "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
             "additionalProperties": {}
           }
         },
@@ -4654,6 +4911,9 @@
         },
         "costing_options": {
           "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
           "additionalProperties": {}
         },
         "geojson": {
@@ -4711,7 +4971,7 @@
                         "required": [
                           "type"
                         ],
-                        "additionalProperties": true
+                        "additionalProperties": {}
                       },
                       {
                         "type": "null"
@@ -4720,6 +4980,9 @@
                   },
                   "properties": {
                     "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
                     "additionalProperties": {}
                   }
                 },
@@ -4727,7 +4990,7 @@
                   "type",
                   "geometry"
                 ],
-                "additionalProperties": true
+                "additionalProperties": {}
               }
             }
           },
@@ -4735,10 +4998,13 @@
             "type",
             "features"
           ],
-          "additionalProperties": true
+          "additionalProperties": {}
         },
         "geometry": {
           "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
           "additionalProperties": {}
         },
         "meta": {
@@ -4751,15 +5017,15 @@
               "type": "integer"
             },
             "breakage_distance_m": {
-              "type": "integer",
-              "description": "Echoes the breakage_distance_m the caller requested, for confirmation — present only when the caller set it. This is the value SENT to the matcher, not a claim about what it did with it."
+              "description": "Echoes the breakage_distance_m the caller requested, for confirmation — present only when the caller set it. This is the value SENT to the matcher, not a claim about what it did with it.",
+              "type": "integer"
             }
           },
           "required": [
             "upstream_ms",
             "point_count"
           ],
-          "additionalProperties": true
+          "additionalProperties": {}
         }
       },
       "required": [
@@ -4771,8 +5037,8 @@
         "road_names",
         "costing"
       ],
-      "additionalProperties": true,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": {}
     },
     "annotations": {
       "title": "Trace Attributes",
@@ -4788,38 +5054,41 @@
       "type": "object",
       "properties": {
         "lat": {
+          "description": "Latitude",
           "type": "number",
           "minimum": -90,
-          "maximum": 90,
-          "description": "Latitude"
+          "maximum": 90
         },
         "lon": {
+          "description": "Longitude",
           "type": "number",
           "minimum": -180,
-          "maximum": 180,
-          "description": "Longitude"
+          "maximum": 180
         },
         "units": {
+          "description": "Speed units — auto-detected from location (mph in US/UK, km/h elsewhere). Override if needed. Accepts 'km'/'mi' as aliases.",
           "type": "string",
           "enum": [
             "miles",
             "kilometers"
-          ],
-          "description": "Speed units — auto-detected from location (mph in US/UK, km/h elsewhere). Override if needed. Accepts 'km'/'mi' as aliases."
+          ]
         }
       },
       "required": [
         "lat",
         "lon"
       ],
-      "additionalProperties": false,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": false
     },
     "outputSchema": {
       "type": "object",
       "properties": {
         "summary": {
           "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
           "additionalProperties": {},
           "description": "Map of scalar facts the LLM should surface verbatim"
         },
@@ -4828,6 +5097,9 @@
           "type": "array",
           "items": {
             "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
             "additionalProperties": {}
           }
         },
@@ -4886,7 +5158,7 @@
                         "required": [
                           "type"
                         ],
-                        "additionalProperties": true
+                        "additionalProperties": {}
                       },
                       {
                         "type": "null"
@@ -4895,6 +5167,9 @@
                   },
                   "properties": {
                     "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
                     "additionalProperties": {}
                   }
                 },
@@ -4902,7 +5177,7 @@
                   "type",
                   "geometry"
                 ],
-                "additionalProperties": true
+                "additionalProperties": {}
               }
             }
           },
@@ -4910,7 +5185,7 @@
             "type",
             "features"
           ],
-          "additionalProperties": true
+          "additionalProperties": {}
         },
         "display_hint": {
           "type": "object",
@@ -4954,11 +5229,11 @@
           "required": [
             "layout"
           ],
-          "additionalProperties": true
+          "additionalProperties": {}
         }
       },
-      "additionalProperties": true,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": {}
     },
     "annotations": {
       "title": "Live Traffic",
@@ -4974,57 +5249,60 @@
       "type": "object",
       "properties": {
         "location": {
+          "description": "Place name or address (will be geocoded)",
           "type": "string",
-          "maxLength": 2000,
-          "description": "Place name or address (will be geocoded)"
+          "maxLength": 2000
         },
         "lat": {
+          "description": "Latitude",
           "type": "number",
           "minimum": -90,
-          "maximum": 90,
-          "description": "Latitude"
+          "maximum": 90
         },
         "lon": {
+          "description": "Longitude",
           "type": "number",
           "minimum": -180,
-          "maximum": 180,
-          "description": "Longitude"
+          "maximum": 180
         },
         "units": {
+          "description": "Temperature/wind units (default: imperial)",
           "type": "string",
           "enum": [
             "imperial",
             "metric"
-          ],
-          "description": "Temperature/wind units (default: imperial)"
+          ]
         },
         "include_forecast": {
-          "type": "boolean",
-          "description": "Include multi-day hourly forecast"
+          "description": "Include multi-day hourly forecast",
+          "type": "boolean"
         },
         "forecast_days": {
+          "description": "Forecast days 1-16 (default 5)",
           "type": "number",
           "minimum": 1,
-          "maximum": 16,
-          "description": "Forecast days 1-16 (default 5)"
+          "maximum": 16
         },
         "include_alerts": {
-          "type": "boolean",
-          "description": "Include severe weather alerts and warnings (default: true)"
+          "description": "Include severe weather alerts and warnings (default: true)",
+          "type": "boolean"
         },
         "include_minutely": {
-          "type": "boolean",
-          "description": "Include minute-by-minute precipitation for next 60 min"
+          "description": "Include minute-by-minute precipitation for next 60 min",
+          "type": "boolean"
         }
       },
-      "additionalProperties": false,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": false
     },
     "outputSchema": {
       "type": "object",
       "properties": {
         "summary": {
           "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
           "additionalProperties": {},
           "description": "Map of scalar facts the LLM should surface verbatim"
         },
@@ -5032,6 +5310,9 @@
           "type": "array",
           "items": {
             "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
             "additionalProperties": {}
           }
         },
@@ -5039,6 +5320,9 @@
           "type": "array",
           "items": {
             "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
             "additionalProperties": {}
           }
         },
@@ -5097,7 +5381,7 @@
                         "required": [
                           "type"
                         ],
-                        "additionalProperties": true
+                        "additionalProperties": {}
                       },
                       {
                         "type": "null"
@@ -5106,6 +5390,9 @@
                   },
                   "properties": {
                     "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
                     "additionalProperties": {}
                   }
                 },
@@ -5113,7 +5400,7 @@
                   "type",
                   "geometry"
                 ],
-                "additionalProperties": true
+                "additionalProperties": {}
               }
             }
           },
@@ -5121,7 +5408,7 @@
             "type",
             "features"
           ],
-          "additionalProperties": true
+          "additionalProperties": {}
         },
         "display_hint": {
           "type": "object",
@@ -5165,7 +5452,7 @@
           "required": [
             "layout"
           ],
-          "additionalProperties": true
+          "additionalProperties": {}
         },
         "alerts": {
           "anyOf": [
@@ -5173,11 +5460,17 @@
               "type": "array",
               "items": {
                 "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
                 "additionalProperties": {}
               }
             },
             {
               "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
               "additionalProperties": {}
             }
           ]
@@ -5186,8 +5479,8 @@
           "type": "string"
         }
       },
-      "additionalProperties": true,
-      "$schema": "http://json-schema.org/draft-07/schema#"
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "additionalProperties": {}
     },
     "annotations": {
       "title": "Weather",
