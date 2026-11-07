@@ -2407,7 +2407,11 @@
       "type": "object",
       "properties": {
         "polygon": {
-          "description": "A GeoJSON Polygon / MultiPolygon geometry, a Feature wrapping one, or a FeatureCollection. Send it as a JSON-encoded string if it has more than about 1,500 positions"
+          "description": "A GeoJSON Polygon / MultiPolygon geometry, a Feature wrapping one, or a FeatureCollection. Send it as a JSON-encoded string if it has more than about 1,500 positions",
+          "type": [
+            "object",
+            "string"
+          ]
         },
         "points": {
           "maxItems": 1000,
