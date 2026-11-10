@@ -247,7 +247,7 @@
   },
   {
     "name": "directions",
-    "description": "Generate routes, ETAs, and turn-by-turn directions between locations. Live traffic is post-route ETA enrichment and does not change the returned path (path_influenced=false); truck traffic adjustments are slowdown-only. Supports car / truck / motorcycle / pedestrian / bicycle, with hazmat + dimension + toll avoidance for commercial routing. ETAs are returned as ISO 8601 with timezone offset (in the destination's local timezone). Use vehicle_profile presets (10 total — DRY_VAN_53, FLATBED_48/_40, STEP_DECK, TANKER, BOX_TRUCK_26, AUTO_CARRIER, SPRINTER_VAN, DOUBLE_TRAILER, OVERSIZE) when routing trucks — they set height/weight/length in one parameter.",
+    "description": "Generate routes, ETAs, and turn-by-turn directions between locations. Live traffic is post-route ETA enrichment; this enrichment does not change the returned path (path_influenced=false), which does not prove whether the routing engine used admitted current speeds to choose it. Truck traffic adjustments are slowdown-only. Supports car / truck / motorcycle / pedestrian / bicycle, with hazmat + dimension + toll avoidance for commercial routing. ETAs are returned as ISO 8601 with timezone offset (in the destination's local timezone). Use vehicle_profile presets (10 total — DRY_VAN_53, FLATBED_48/_40, STEP_DECK, TANKER, BOX_TRUCK_26, AUTO_CARRIER, SPRINTER_VAN, DOUBLE_TRAILER, OVERSIZE) when routing trucks — they set height/weight/length in one parameter.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -359,7 +359,7 @@
           "type": "boolean"
         },
         "include_traffic": {
-          "description": "Apply post-route live-traffic ETA enrichment (default: true). Traffic does not change the returned path; truck adjustments are slowdown-only.",
+          "description": "Apply post-route live-traffic ETA enrichment (default: true). This enrichment does not change the returned path (path_influenced=false), which does not prove whether the routing engine used admitted current speeds to choose it; truck adjustments are slowdown-only.",
           "type": "boolean"
         },
         "include_weather": {
@@ -865,15 +865,15 @@
         },
         "base_duration_seconds": {
           "type": "number",
-          "description": "Route duration before any traffic-based adjustment, in seconds."
+          "description": "Duration from the routing engine, in seconds, before any independent ETA enrichment. This is not a guarantee of a traffic-free figure: when current speeds were admitted for the request (see `traffic_route`), the routing engine may have used them, and this response cannot verify that either way."
         },
         "effective_duration_seconds": {
           "type": "number",
-          "description": "Authoritative duration for this response, in seconds, after any applicable traffic-based adjustment."
+          "description": "Authoritative duration for this response, in seconds: the routing engine's duration plus any independent traffic adjustment that was applied. Equal to `base_duration_seconds` when no independent adjustment was applied, including when one was withheld (see `traffic_provenance.outcome`)."
         },
         "traffic_delay_seconds": {
           "type": "number",
-          "description": "Effective duration minus base duration, in seconds. Positive means traffic made the ETA slower, negative means it made the ETA faster, and zero means the duration was unchanged. For truck costing, general traffic evidence is slowdown-only, so this value is never negative."
+          "description": "Effective duration minus base duration, in seconds. Positive means traffic made the ETA slower, negative means it made the ETA faster, and zero means the duration was unchanged. For truck costing, general traffic evidence is slowdown-only, so this value is never negative. A value of 0 means there was no net independent adjustment (none was applied, or the applied adjustment netted to zero); it is not proof that the routing engine used no traffic."
         },
         "base_arrival_utc": {
           "type": "string",
@@ -921,17 +921,18 @@
                 "INSUFFICIENT_COVERAGE",
                 "STALE_EVIDENCE",
                 "UPSTREAM_ERROR",
-                "APPLIED"
+                "APPLIED",
+                "ADJUSTMENT_WITHHELD"
               ],
-              "description": "Neutral, stable reason code for what happened to traffic evidence on this request. `TRAFFIC_DISABLED`: no traffic evidence was sought. `PROVIDER_DISABLED`: evidence was sought but the traffic backend was not configured. `QUOTA_EXHAUSTED`: the traffic backend's spend allotment was exhausted. `NO_SEGMENT_MATCH`: the backend answered but no sample matched a live road segment. `INSUFFICIENT_COVERAGE`: the backend reported no sensor coverage for the sampled area. `STALE_EVIDENCE`: an adjustment was computed, but the evidence behind it was fetched more than 30 minutes ago because the provider could not refresh it. `UPSTREAM_ERROR`: a configured backend or network failure prevented reading all requested traffic evidence. `APPLIED`: an adjustment was computed and reached this response; inspect `retrieved_at` / `retrieval_age_seconds` to see how old the evidence behind it is (acquisition age — this traffic source reports no observation time, see those fields' own descriptions). Material failure codes take precedence over `APPLIED` when only partial evidence adjusted the duration; `duration_influenced` remains true in that case."
+              "description": "Neutral, stable reason code for what happened to traffic evidence on this request. `TRAFFIC_DISABLED`: no traffic evidence was sought. `PROVIDER_DISABLED`: evidence was sought but the traffic backend was not configured. `QUOTA_EXHAUSTED`: the traffic backend's spend allotment was exhausted. `NO_SEGMENT_MATCH`: the backend answered but no sample matched a live road segment. `INSUFFICIENT_COVERAGE`: the backend reported no sensor coverage for the sampled area. `STALE_EVIDENCE`: an adjustment was computed, but the evidence behind it was fetched more than 30 minutes ago because the provider could not refresh it. `UPSTREAM_ERROR`: a configured backend or network failure prevented reading all requested traffic evidence. `APPLIED`: an adjustment was computed and reached this response; inspect `retrieved_at` / `retrieval_age_seconds` to see how old the evidence behind it is (acquisition age — this traffic source reports no observation time, see those fields' own descriptions). `ADJUSTMENT_WITHHELD`: usable traffic evidence was obtained, but no independent adjustment was added to the duration because current speeds were admitted for this route request (see `traffic_route`); the routing engine's duration is returned unchanged and whether the engine actually used current speeds is unverified. A request whose evidence matched no road segment is `NO_SEGMENT_MATCH`, never `ADJUSTMENT_WITHHELD`. Material failure codes take precedence over `APPLIED` when only partial evidence adjusted the duration; `duration_influenced` remains true in that case. Material failure codes likewise take precedence over `ADJUSTMENT_WITHHELD`."
             },
             "path_influenced": {
               "type": "boolean",
-              "description": "Whether traffic could have changed WHICH roads were returned. False today: the route is selected from the road network's own speeds, so traffic never changes the path — only the estimated duration."
+              "description": "Whether the traffic enrichment layer changed WHICH roads were returned. False today: traffic evidence is applied only after the route is chosen, so this layer never changes the path — only the estimated duration. A false value does not prove whether the routing engine used admitted current speeds when it chose the route (see `traffic_route`)."
             },
             "duration_influenced": {
               "type": "boolean",
-              "description": "Whether traffic actually changed the duration returned by THIS request. False when no traffic adjustment was applied, even if traffic was requested and fetched successfully."
+              "description": "Whether traffic actually changed the duration returned by THIS request. False when no traffic adjustment was applied, even if traffic was requested and fetched successfully, and when an adjustment was withheld (`ADJUSTMENT_WITHHELD`). It reports only what was added to the routing engine's duration, not whether the engine used traffic."
             },
             "source_as_of": {
               "description": "DEPRECATED since 2026-09-24, always null. The traffic source provides no observation timestamp, so this field can never be filled honestly. See `retrieved_at` for when ThinAir fetched the traffic evidence (not when it was observed). Will be removed in /v2.",
