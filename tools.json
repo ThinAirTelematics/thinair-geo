@@ -359,7 +359,7 @@
           "type": "boolean"
         },
         "include_traffic": {
-          "description": "Apply post-route live-traffic ETA enrichment (default: true). This enrichment does not change the returned path (path_influenced=false), which does not prove whether the routing engine used admitted current speeds to choose it; truck adjustments are slowdown-only.",
+          "description": "Apply post-route live-traffic ETA enrichment (default: true; applies to car, truck and motorcycle routes only). This enrichment does not change the returned path (path_influenced=false), which does not prove whether the routing engine used admitted current speeds to choose it; truck adjustments are slowdown-only.",
           "type": "boolean"
         },
         "include_weather": {
