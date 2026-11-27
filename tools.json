@@ -897,6 +897,10 @@
             "null"
           ]
         },
+        "traffic_skipped_reason": {
+          "description": "Present only when live traffic was skipped for this trip. `SCHEDULED_DEPARTURE`: the trip does not leave now, so no live traffic was looked up and the duration and arrival are the baseline estimate; `traffic_provenance` then reports mode `none` and outcome `TRAFFIC_DISABLED`. Other values may be added; read an unknown value as live traffic skipped.",
+          "type": "string"
+        },
         "traffic_provenance": {
           "type": "object",
           "properties": {
